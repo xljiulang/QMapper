@@ -8,3 +8,6 @@
 /MiniMapper/obj
 /.vs/MiniMapper/v16
 /MiniMapper/bin/Debug
+/MiniMapper.Benchmark/bin
+/MiniMapper/bin/Release/netstandard1.3
+/MiniMapper.Benchmark/obj

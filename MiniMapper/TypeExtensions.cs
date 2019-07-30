@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace MiniMapper
 {
@@ -7,6 +8,27 @@ namespace MiniMapper
     /// </summary>
     public static class TypeExtensions
     {
+        /// <summary>
+        /// 是否可以从TBase类型派生
+        /// </summary>
+        /// <typeparam name="TBase"></typeparam>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsInheritFrom<TBase>(this Type type)
+        {
+            return typeof(TBase).IsAssignableFrom(type);
+        }
+
+        /// <summary>
+        /// 返回可空类型对应的非可空类型
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static Type GetUnNullableType(this Type type)
+        {
+            return Nullable.GetUnderlyingType(type) ?? type;
+        }
+
 #if !NETSTANDARD1_3
         /// <summary>
         /// 返回type的详细类型

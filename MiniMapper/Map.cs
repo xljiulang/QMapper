@@ -244,15 +244,9 @@ namespace MiniMapper
                     var destination = Expression.Parameter(typeof(TDestination), "destination");
                     var value = (Expression)Expression.Property(source, propertySource);
 
-                    if (propertySource.PropertyType != propertyDestination.PropertyType)
-                    {
-                        var valueArg = Expression.Convert(value, typeof(object));
-                        var targetTypeArg = Expression.Constant(propertyDestination.PropertyType);
-                        var objectValue = Expression.Call(null, Converter.ConvertToTypeMethod, valueArg, targetTypeArg);
-                        value = Expression.Convert(objectValue, propertyDestination.PropertyType);
-                    }
+                    var valueCasted = Converter.Convert(value, propertySource.PropertyType, propertyDestination.PropertyType);
+                    var body = Expression.Call(destination, setter, valueCasted);
 
-                    var body = Expression.Call(destination, setter, value);
                     return Expression.Lambda<Action<TSource, TDestination>>(body, source, destination).Compile();
                 }
 
@@ -263,7 +257,14 @@ namespace MiniMapper
                 /// <param name="destination">目标</param>
                 public void Invoke(TSource source, TDestination destination)
                 {
-                    this.mapAction.Invoke(source, destination);
+                    try
+                    {
+                        this.mapAction.Invoke(source, destination);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new MapException(this.Name, ex);
+                    }
                 }
 
                 /// <summary>

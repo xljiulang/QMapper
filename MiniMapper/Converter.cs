@@ -10,6 +10,11 @@ namespace MiniMapper
     static class Converter
     {
         /// <summary>
+        /// 转换为字符串方法
+        /// </summary>
+        private static readonly MethodInfo convertToStringMethod = typeof(Converter).GetMethod($"{nameof(Converter.ConvertToString)}", BindingFlags.Static | BindingFlags.NonPublic);
+
+        /// <summary>
         /// 转换为枚举方法
         /// </summary>
         private static readonly MethodInfo convertToEnumMethod = typeof(Converter).GetMethod($"{nameof(Converter.ConvertToEnum)}", BindingFlags.Static | BindingFlags.NonPublic);
@@ -41,6 +46,7 @@ namespace MiniMapper
             var notNullValueType = valueType.GetUnNullableType();
             var notNullTargetType = targetType.GetUnNullableType();
 
+            // 类型与其可空类型直接强制转换
             if (notNullValueType == notNullTargetType)
             {
                 return Expression.Convert(value, targetType);
@@ -49,7 +55,11 @@ namespace MiniMapper
             var valueArg = Expression.Convert(value, typeof(object));
             var targetTypeArg = Expression.Constant(notNullTargetType);
 
-            if (notNullTargetType.IsInheritFrom<Enum>() == true)
+            if (notNullTargetType == typeof(string))
+            {
+                value = Expression.Call(null, convertToStringMethod, valueArg);
+            }
+            else if (notNullTargetType.IsInheritFrom<Enum>() == true)
             {
                 value = Expression.Call(null, convertToEnumMethod, valueArg, targetTypeArg);
             }
@@ -65,6 +75,16 @@ namespace MiniMapper
             return Expression.Convert(value, targetType);
         }
 
+        /// <summary>
+        /// 将value转换为string类型
+        /// </summary>
+        /// <param name="value">要转换的值</param>
+        /// <exception cref="NotSupportedException"></exception>
+        /// <returns></returns>
+        private static object ConvertToString(object value)
+        {
+            return value?.ToString();
+        }
 
         /// <summary>
         /// 将value转换为枚举类型

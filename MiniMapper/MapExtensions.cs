@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NMapper
+namespace MiniMapper
 {
     /// <summary>
     /// 提供Map扩展

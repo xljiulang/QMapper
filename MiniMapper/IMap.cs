@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace NMapper
+namespace MiniMapper
 {
     /// <summary>
     /// 定义表示映射体的接口

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace NMapper
+namespace MiniMapper
 {
     /// <summary>
     /// 提供类型转换

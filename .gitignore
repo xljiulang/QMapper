@@ -5,3 +5,6 @@
 /.vs/NMapper
 /NMapper/bin/Debug/netstandard2.0
 /NMapper/obj
+/MiniMapper/obj
+/.vs/MiniMapper/v16
+/MiniMapper/bin/Debug

@@ -21,3 +21,21 @@ var b = a.AsMap("Name","Age").To<B>();
 var b = a.AsMap().Ignore(item=>item.Id).To<B>();
 
 ```
+
+### Benchmark
+```
+BenchmarkDotNet=v0.11.5, OS=Windows 10.0.17134.885 (1803/April2018Update/Redstone4)
+Intel Core i3-4150 CPU 3.50GHz (Haswell), 1 CPU, 4 logical and 2 physical cores
+.NET Core SDK=3.0.100-preview6-012264
+  [Host]     : .NET Core 3.0.0-preview6-27804-01 (CoreCLR 4.700.19.30373, CoreFX 4.700.19.30308), 64bit RyuJIT
+  DefaultJob : .NET Core 3.0.0-preview6-27804-01 (CoreCLR 4.700.19.30373, CoreFX 4.700.19.30308), 64bit RyuJIT
+
+
+|                          Method |           Mean |         Error |        StdDev |         Median |
+|-------------------------------- |---------------:|--------------:|--------------:|---------------:|
+|                         MiniMap |       214.6 ns |      6.877 ns |      19.17 ns |       209.1 ns |
+|                         EmitMap |       626.4 ns |     12.458 ns |      30.56 ns |       618.2 ns |
+| AutoMap_Singleton_Configuration |       200.9 ns |      4.188 ns |      10.19 ns |       198.7 ns |
+| AutoMap_Transient_Configuration | 2,803,766.1 ns | 55,423.428 ns | 136,992.98 ns | 2,766,244.5 ns |
+
+```

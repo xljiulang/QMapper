@@ -11,3 +11,5 @@
 /MiniMapper.Benchmark/bin
 /MiniMapper/bin/Release/netstandard1.3
 /MiniMapper.Benchmark/obj
+/MiniMapper.Test/bin/Debug/netcoreapp3.0
+/MiniMapper.Test/obj

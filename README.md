@@ -24,18 +24,19 @@ var b = a.AsMap().Ignore(item=>item.Id).To<B>();
 
 ### Benchmark
 ```
-BenchmarkDotNet=v0.11.5, OS=Windows 10.0.17134.885 (1803/April2018Update/Redstone4)
-Intel Core i3-4150 CPU 3.50GHz (Haswell), 1 CPU, 4 logical and 2 physical cores
+BenchmarkDotNet=v0.11.5, OS=Windows 7 SP1 (6.1.7601.0)
+Intel Core i5-4460 CPU 3.20GHz (Haswell), 1 CPU, 4 logical and 4 physical cores
+Frequency=3117851 Hz, Resolution=320.7337 ns, Timer=TSC
 .NET Core SDK=3.0.100-preview6-012264
   [Host]     : .NET Core 3.0.0-preview6-27804-01 (CoreCLR 4.700.19.30373, CoreFX 4.700.19.30308), 64bit RyuJIT
   DefaultJob : .NET Core 3.0.0-preview6-27804-01 (CoreCLR 4.700.19.30373, CoreFX 4.700.19.30308), 64bit RyuJIT
 
 
-|                          Method |           Mean |          Error |         StdDev |         Median |
-|-------------------------------- |---------------:|---------------:|---------------:|---------------:|
-|                         QMap |       139.4 ns |       3.345 ns |       9.599 ns |       136.7 ns |
-|                         EmitMap |       782.0 ns |      31.975 ns |      93.777 ns |       767.7 ns |
-| AutoMap_Singleton_Configuration |       210.7 ns |       6.243 ns |      18.210 ns |       205.9 ns |
-| AutoMap_Transient_Configuration | 3,176,564.5 ns | 107,328.247 ns | 304,472.373 ns | 3,075,543.4 ns |
+|                          Method |           Mean |          Error |         StdDev |
+|-------------------------------- |---------------:|---------------:|---------------:|
+|                            QMap |       117.0 ns |      0.6963 ns |      0.6513 ns |
+|                         EmitMap |       574.5 ns |     11.0869 ns |     10.3707 ns |
+| AutoMap_Singleton_Configuration |       203.9 ns |      2.4170 ns |      2.2609 ns |
+| AutoMap_Transient_Configuration | 2,251,689.1 ns | 28,790.2958 ns | 24,041.2009 ns |
 
 ```

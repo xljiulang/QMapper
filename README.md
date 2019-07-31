@@ -1,5 +1,5 @@
-# MiniMapper
-快、准、狠的小小Mapper组件
+# QMapper
+快、准、狠的Mapper组件
 
 ### 约定
 * 属性名称相同的才能映射
@@ -33,7 +33,7 @@ Intel Core i3-4150 CPU 3.50GHz (Haswell), 1 CPU, 4 logical and 2 physical cores
 
 |                          Method |           Mean |          Error |         StdDev |         Median |
 |-------------------------------- |---------------:|---------------:|---------------:|---------------:|
-|                         MiniMap |       139.4 ns |       3.345 ns |       9.599 ns |       136.7 ns |
+|                         QMap |       139.4 ns |       3.345 ns |       9.599 ns |       136.7 ns |
 |                         EmitMap |       782.0 ns |      31.975 ns |      93.777 ns |       767.7 ns |
 | AutoMap_Singleton_Configuration |       210.7 ns |       6.243 ns |      18.210 ns |       205.9 ns |
 | AutoMap_Transient_Configuration | 3,176,564.5 ns | 107,328.247 ns | 304,472.373 ns | 3,075,543.4 ns |

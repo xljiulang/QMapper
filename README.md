@@ -22,6 +22,11 @@ var b = a.AsMap().Ignore(item=>item.Id).To<B>();
 
 ```
 
+### 应用场景
+* PO、VO、DTO相互转换
+* PO、VO、DTO相互转换时保护一些字段
+* 根据前端提交的字段，动态PO、VO、DTO相互转换
+
 ### Benchmark
 ```
 BenchmarkDotNet=v0.11.5, OS=Windows 10.0.17134.885 (1803/April2018Update/Redstone4)

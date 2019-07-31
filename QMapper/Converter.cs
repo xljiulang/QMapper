@@ -1,161 +1,75 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace QMapper
 {
     /// <summary>
-    /// 提供类型转换
+    /// 提供高效的属性转换器
     /// </summary>
-    static class Converter
+    abstract class Converter
     {
         /// <summary>
-        /// 转换为字符串方法
+        /// 下一个转换器
         /// </summary>
-        private static readonly MethodInfo convertToStringMethod = typeof(Converter).GetMethod($"{nameof(Converter.ConvertToString)}", BindingFlags.Static | BindingFlags.NonPublic);
+        public Converter Next { get; set; }
 
         /// <summary>
-        /// 转换为枚举方法
+        /// 执行转换
         /// </summary>
-        private static readonly MethodInfo convertToEnumMethod = typeof(Converter).GetMethod($"{nameof(Converter.ConvertToEnum)}", BindingFlags.Static | BindingFlags.NonPublic);
+        /// <param name="context">上下文</param> 
+        /// <returns></returns>
+        public abstract Expression Invoke(Context context);
 
         /// <summary>
-        /// 转换为IConvertible方法
+        /// 获取本类型声明的静态方法
         /// </summary>
-        private static readonly MethodInfo converToConvertibleMethod = typeof(Converter).GetMethod($"{nameof(Converter.ConverToConvertible)}", BindingFlags.Static | BindingFlags.NonPublic);
+        /// <param name="name">方法名</param>
+        /// <returns></returns>
+        protected MethodInfo GetStaticMethod(string name)
+        {
+            return this.GetType().GetMethod(name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+        }
 
         /// <summary>
-        /// 转换为特殊类型方法
+        /// 转换器实例
         /// </summary>
-        private static readonly MethodInfo convertToTypeMethod = typeof(Converter).GetMethod($"{nameof(Converter.ConvertToType)}", BindingFlags.Static | BindingFlags.NonPublic);
+        private static readonly Converter converter;
+
+        /// <summary>
+        /// 静态构造器
+        /// </summary>
+        static Converter()
+        {
+            var converters = new Converter[]
+            {
+                new TypeEqualsConverter(),
+                new TypeAndNullableTypeConverter(),
+                new StringTargetConverter(),
+                new EnumTargetConverter(),
+                new ConvertibleConverter()
+            };
+
+            converters.Aggregate((pre, next) =>
+            {
+                pre.Next = next;
+                return next;
+            }).Next = new OthersTargetConverter();
+
+            converter = converters.First();
+        }
 
         /// <summary>
         /// 表达式类型转换
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="valueType"></param>
-        /// <param name="targetType"></param>
+        /// <param name="value">值</param>
+        /// <param name="targetType">目标类型</param>
         /// <returns></returns>
-        public static Expression Convert(Expression value, Type valueType, Type targetType)
+        public static Expression Convert(Expression value, Type targetType)
         {
-            if (valueType == targetType)
-            {
-                return value;
-            }
-
-            var notNullValueType = valueType.GetUnNullableType();
-            var notNullTargetType = targetType.GetUnNullableType();
-
-            // 类型与其可空类型直接强制转换
-            if (notNullValueType == notNullTargetType)
-            {
-                return Expression.Convert(value, targetType);
-            }
-
-            // 转换为string类型
-            var valueArg = Expression.Convert(value, typeof(object));
-            if (notNullTargetType == typeof(string))
-            {
-                return Expression.Call(null, convertToStringMethod, valueArg);
-            }
-
-            // 其它类型转换，返回object
-            var targetTypeArg = Expression.Constant(notNullTargetType);
-            if (notNullTargetType.IsInheritFrom<Enum>() == true)
-            {
-                value = Expression.Call(null, convertToEnumMethod, valueArg, targetTypeArg);
-            }
-            else if (notNullTargetType.IsInheritFrom<IConvertible>() && notNullValueType.IsInheritFrom<IConvertible>())
-            {
-                value = Expression.Call(null, converToConvertibleMethod, valueArg, targetTypeArg);
-            }
-            else
-            {
-                value = Expression.Call(null, convertToTypeMethod, valueArg, targetTypeArg);
-            }
-
-            return Expression.Convert(value, targetType);
-        }
-
-        /// <summary>
-        /// 将value转换为string类型
-        /// </summary>
-        /// <param name="value">要转换的值</param>
-        /// <exception cref="NotSupportedException"></exception>
-        /// <returns></returns>
-        private static string ConvertToString(object value)
-        {
-            return value?.ToString();
-        }
-
-        /// <summary>
-        /// 将value转换为枚举类型
-        /// </summary>
-        /// <param name="value">要转换的值</param>
-        /// <param name="notNullTargetType">转换的目标类型</param>
-        /// <exception cref="NotSupportedException"></exception>
-        /// <returns></returns>
-        private static object ConvertToEnum(object value, Type notNullTargetType)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-            return Enum.Parse(notNullTargetType, value.ToString(), true);
-        }
-
-        /// <summary>
-        /// 将value转换为IConvertible类型
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="notNullTargetType"></param>
-        /// <returns></returns>
-        private static object ConverToConvertible(object value, Type notNullTargetType)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            var convertible = value as IConvertible;
-            return convertible.ToType(notNullTargetType, null);
-        }
-
-        /// <summary>
-        /// 将value转换为目标类型
-        /// </summary>
-        /// <param name="value">要转换的值</param>
-        /// <param name="notNullTargetType">转换的目标类型</param>
-        /// <exception cref="NotSupportedException"></exception>
-        /// <returns></returns>
-        private static object ConvertToType(object value, Type notNullTargetType)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            if (typeof(Guid) == notNullTargetType)
-            {
-                return Guid.Parse(value.ToString());
-            }
-
-            if (typeof(DateTimeOffset) == notNullTargetType)
-            {
-                return DateTimeOffset.Parse(value.ToString());
-            }
-
-            if (typeof(Uri) == notNullTargetType)
-            {
-                return new Uri(value.ToString(), UriKind.RelativeOrAbsolute);
-            }
-
-            if (typeof(Version) == notNullTargetType)
-            {
-                return new Version(value.ToString());
-            }
-
-            throw new NotSupportedException($"不支持将值{value}转换为{notNullTargetType}");
+            var context = new Context(value, targetType);
+            return converter.Invoke(context);
         }
     }
 }

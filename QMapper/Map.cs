@@ -122,13 +122,17 @@ namespace QMapper
                 return null;
             }
 
-            if (this.includeMembers == null)
-            {
-                return MapItem<TDestination>.Map(this.source, destination);
-            }
-            else
+            try
             {
                 return MapItem<TDestination>.Map(this.source, destination, this.includeMembers);
+            }
+            catch (TypeInitializationException ex)
+            {
+                throw new MapException(typeof(TSource), typeof(TDestination), ex.InnerException);
+            }
+            catch (Exception ex)
+            {
+                throw new MapException(typeof(TSource), typeof(TDestination), ex);
             }
         }
 
@@ -159,21 +163,6 @@ namespace QMapper
             }
 
             /// <summary>
-            /// 映射所有默认匹配的属性
-            /// </summary>
-            /// <param name="source">源</param>
-            /// <param name="destination">目标</param>             
-            /// <returns></returns>
-            public static TDestination Map(TSource source, TDestination destination)
-            {
-                foreach (var map in maps)
-                {
-                    map.Invoke(source, destination);
-                }
-                return destination;
-            }
-
-            /// <summary>
             /// 映射目标属性
             /// </summary>
             /// <param name="source">源</param>
@@ -182,13 +171,24 @@ namespace QMapper
             /// <returns></returns>
             public static TDestination Map(TSource source, TDestination destination, HashSet<string> members)
             {
-                foreach (var map in maps)
+                if (members == null)
                 {
-                    if (members.Contains(map.Name) == true)
+                    foreach (var map in maps)
                     {
                         map.Invoke(source, destination);
                     }
                 }
+                else
+                {
+                    foreach (var map in maps)
+                    {
+                        if (members.Contains(map.Name) == true)
+                        {
+                            map.Invoke(source, destination);
+                        }
+                    }
+                }
+
                 return destination;
             }
 
@@ -226,27 +226,25 @@ namespace QMapper
 
                 /// <summary>
                 /// 创建映射委托
-                /// (source,destination) => destination.SetName(source.Name);
+                /// (source,destination) => destination.Name = source.Name;
                 /// </summary>                  
                 /// <param name="propertySource">源属性</param>
                 /// <param name="propertyDestination">目标属性</param>
                 /// <returns></returns>
                 private static Action<TSource, TDestination> CreateMapAction(PropertyInfo propertySource, PropertyInfo propertyDestination)
                 {
-                    var getter = propertySource.GetGetMethod();
-                    var setter = propertyDestination.GetSetMethod();
-                    if (getter == null || setter == null)
+                    if (propertySource.GetGetMethod() == null || propertyDestination.GetSetMethod() == null)
                     {
                         return null;
                     }
 
                     var source = Expression.Parameter(typeof(TSource), "source");
                     var destination = Expression.Parameter(typeof(TDestination), "destination");
-                    var value = (Expression)Expression.Property(source, propertySource);
 
-                    var valueCasted = Converter.Convert(value, propertySource.PropertyType, propertyDestination.PropertyType);
-                    var body = Expression.Call(destination, setter, valueCasted);
+                    var value = Expression.Property(source, propertySource);
+                    var valueCasted = Converter.Convert(value, propertyDestination.PropertyType);
 
+                    var body = Expression.Assign(Expression.Property(destination, propertyDestination), valueCasted);
                     return Expression.Lambda<Action<TSource, TDestination>>(body, source, destination).Compile();
                 }
 
@@ -257,14 +255,7 @@ namespace QMapper
                 /// <param name="destination">目标</param>
                 public void Invoke(TSource source, TDestination destination)
                 {
-                    try
-                    {
-                        this.mapAction.Invoke(source, destination);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new MapException(this.Name, ex);
-                    }
+                    this.mapAction.Invoke(source, destination);
                 }
 
                 /// <summary>

@@ -12,6 +12,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\QMapper.Model\QMapper.Model.csproj" />
     <ProjectReference Include="..\QMapper\QMapper.csproj" />
   </ItemGroup>
 

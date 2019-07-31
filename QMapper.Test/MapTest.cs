@@ -1,4 +1,4 @@
-﻿using System;
+﻿using QMapper.Model;
 using Xunit;
 
 namespace QMapper.Test
@@ -23,7 +23,6 @@ namespace QMapper.Test
             Assert.Equal(a.Time.ToString(), b.Time.ToLocalTime().DateTime.ToString());
         }
 
-
         [Fact]
         public void MapIgnore()
         {
@@ -33,52 +32,6 @@ namespace QMapper.Test
             Assert.Equal(a.Age, b.Age);
             Assert.Equal(a.Email, b.Email);
             Assert.NotEqual(a.Name, b.Name);
-        }
-
-        class A
-        {
-            public string Name { get; set; } = "A";
-
-            public int? Age { get; set; } = 9;
-
-            public string Email { get; set; } = "@A";
-
-            public string Version { get; set; } = "2.0";
-
-            public Guid Guid { get; set; } = Guid.NewGuid();
-
-            public string Uri { get; set; } = "http://www.mimimapper.com/";
-
-            public int Gender { get; set; }
-
-            public DateTime Time { get; set; } = DateTime.Now;
-        }
-
-
-        public enum Gender
-        {
-            男 = 0,
-            女 = 1
-        }
-
-
-        class B
-        {
-            public string Name { get; set; }
-
-            public int Age { get; set; }
-
-            public string Email { get; set; }
-
-            public Version Version { get; set; }
-
-            public string Guid { get; set; }
-
-            public Uri Uri { get; set; }
-
-            public Gender Gender { get; set; }
-
-            public DateTimeOffset Time { get; set; }
-        }
+        }         
     }
 }

@@ -1,56 +1,39 @@
 ﻿using AutoMapper;
 using BenchmarkDotNet.Attributes;
 using EmitMapper;
+using QMapper.Model;
 
 namespace QMapper.Benchmark
 {
     public class MapContext
     {
-        private readonly A a = new A();
+        private readonly UserDto user = new UserDto();
 
-        private static readonly IMapper autoMapper = new MapperConfiguration(cfg => cfg.CreateMap<A, B>()).CreateMapper();
+        private static readonly IMapper autoMapper = new MapperConfiguration(cfg => cfg.CreateMap<UserDto, UserInfo>()).CreateMapper();
 
         [Benchmark]
         public void QMap()
         {
-            a.AsMap().To<B>();
+            user.AsMap().To<UserInfo>();
         }
 
         [Benchmark]
         public void EmitMap()
         {
-            ObjectMapperManager.DefaultInstance.GetMapper<A, B>().Map(a);
+            ObjectMapperManager.DefaultInstance.GetMapper<UserDto, UserInfo>().Map(user);
         }
 
         [Benchmark]
         public void AutoMap_Singleton_Configuration()
         {
-            autoMapper.Map<A, B>(a);
+            autoMapper.Map<UserDto, UserInfo>(user);
         }
 
         [Benchmark]
         public void AutoMap_Transient_Configuration()
         {
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<A, B>()).CreateMapper();
-            mapper.Map<A, B>(a);
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserDto, UserInfo>()).CreateMapper();
+            mapper.Map<UserDto, UserInfo>(user);
         }
-    }
-
-    public class A
-    {
-        public string Name { get; set; } = "A";
-
-        public int? Age { get; set; } = 9;
-
-        public string Email { get; set; } = "@A";
-    }
-
-    public class B
-    {
-        public string Name { get; set; } = "B";
-
-        public int Age { get; set; } = 100;
-
-        public string Email { get; set; } = "@B";
     }
 }

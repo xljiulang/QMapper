@@ -17,17 +17,7 @@ namespace QMapper
         public static bool IsInheritFrom<TBase>(this Type type)
         {
             return typeof(TBase).IsAssignableFrom(type);
-        }
-
-        /// <summary>
-        /// 返回可空类型对应的非可空类型
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static Type GetUnNullableType(this Type type)
-        {
-            return Nullable.GetUnderlyingType(type) ?? type;
-        }
+        }  
 
 #if !NETSTANDARD1_3
         /// <summary>

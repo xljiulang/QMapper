@@ -8,19 +8,33 @@ namespace QMapper
     public class MapException : Exception
     {
         /// <summary>
-        /// 获取映射的属性名称
+        /// 获取源类型
         /// </summary>
-        public string PropertyName { get; }
+        public Type SourceType { get; }
+
+        /// <summary>
+        /// 获取目标类型
+        /// </summary>
+        public Type DestinationType { get; }
 
         /// <summary>
         /// 映射异常
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="inner"></param>
-        public MapException(string propertyName, Exception inner)
-            : base($"属性{propertyName}类型转换异常", inner)
+        public MapException(Type sourceType, Type destinationType, Exception inner)
+            : base(null, inner)
         {
-            this.PropertyName = propertyName;
+            this.SourceType = sourceType;
+            this.DestinationType = destinationType;
+        }
+
+        /// <summary>
+        /// 获取提示信息
+        /// </summary>
+        public override string Message
+        {
+            get => $"类型{this.SourceType}转换为{this.DestinationType}失败";
         }
     }
 }

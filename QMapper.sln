@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29102.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QMapper", "QMapper\QMapper.csproj", "{9B3382E3-8246-4E82-B906-3318BF188845}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QMapper.Benchmark", "QMapper.Benchmark\QMapper.Benchmark.csproj", "{C4199924-5226-40D7-AC6E-9841799B4BC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QMapper.Test", "QMapper.Test\QMapper.Test.csproj", "{66BB56A3-F192-4712-9AA1-A4C2F141873D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B3382E3-8246-4E82-B906-3318BF188845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B3382E3-8246-4E82-B906-3318BF188845}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B3382E3-8246-4E82-B906-3318BF188845}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B3382E3-8246-4E82-B906-3318BF188845}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4199924-5226-40D7-AC6E-9841799B4BC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4199924-5226-40D7-AC6E-9841799B4BC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4199924-5226-40D7-AC6E-9841799B4BC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4199924-5226-40D7-AC6E-9841799B4BC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66BB56A3-F192-4712-9AA1-A4C2F141873D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66BB56A3-F192-4712-9AA1-A4C2F141873D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66BB56A3-F192-4712-9AA1-A4C2F141873D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66BB56A3-F192-4712-9AA1-A4C2F141873D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {01C734DF-29FB-481C-B88C-3B54FB7DDAAE}
+	EndGlobalSection
+EndGlobal

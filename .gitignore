@@ -2,14 +2,6 @@
 # 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
 ################################################################################
 
-/.vs/NMapper
-/NMapper/bin/Debug/netstandard2.0
-/NMapper/obj
-/MiniMapper/obj
-/.vs/MiniMapper/v16
-/MiniMapper/bin/Debug
-/MiniMapper.Benchmark/bin
-/MiniMapper/bin/Release/netstandard1.3
-/MiniMapper.Benchmark/obj
-/MiniMapper.Test/bin/Debug/netcoreapp3.0
-/MiniMapper.Test/obj
+/.vs
+[Bb]in/
+[Oo]bj/

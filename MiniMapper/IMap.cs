@@ -26,16 +26,14 @@ namespace MiniMapper
         IMap<TSource> Ignore(params string[] memberName);
 
         /// <summary>
-        /// 映射到目标对象
-        /// 要求destination为public修饰
+        /// 映射到目标对象      
         /// </summary>
         /// <typeparam name="TDestination"></typeparam>     
         /// <returns></returns>
         TDestination To<TDestination>() where TDestination : class, new();
 
         /// <summary>
-        /// 映射到目标对象
-        /// 要求destination为public修饰
+        /// 映射到目标对象     
         /// </summary>
         /// <typeparam name="TDestination"></typeparam>
         /// <param name="destination">目标对象</param>

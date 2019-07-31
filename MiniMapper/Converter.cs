@@ -52,14 +52,16 @@ namespace MiniMapper
                 return Expression.Convert(value, targetType);
             }
 
+            // 转换为string类型
             var valueArg = Expression.Convert(value, typeof(object));
-            var targetTypeArg = Expression.Constant(notNullTargetType);
-
             if (notNullTargetType == typeof(string))
             {
-                value = Expression.Call(null, convertToStringMethod, valueArg);
+                return Expression.Call(null, convertToStringMethod, valueArg);
             }
-            else if (notNullTargetType.IsInheritFrom<Enum>() == true)
+
+            // 其它类型转换，返回object
+            var targetTypeArg = Expression.Constant(notNullTargetType);
+            if (notNullTargetType.IsInheritFrom<Enum>() == true)
             {
                 value = Expression.Call(null, convertToEnumMethod, valueArg, targetTypeArg);
             }
@@ -81,7 +83,7 @@ namespace MiniMapper
         /// <param name="value">要转换的值</param>
         /// <exception cref="NotSupportedException"></exception>
         /// <returns></returns>
-        private static object ConvertToString(object value)
+        private static string ConvertToString(object value)
         {
             return value?.ToString();
         }

@@ -15,34 +15,14 @@ namespace QMapper
         public Expression Value { get; }
 
         /// <summary>
-        /// 获取要转换的类型
+        /// 获取源类型信息
         /// </summary>
-        public Type ValueType { get; }
+        public TypeInfo Source { get; }
 
         /// <summary>
-        /// 获取要转换的类型对应的非可空类型
+        /// 获取目标类型信息
         /// </summary>
-        public Type ValueNotNullType { get; }
-
-        /// <summary>
-        /// 获取要转换的类型是否为非空值类型
-        /// </summary>
-        public bool ValueIsNotNullValueType { get; }
-
-        /// <summary>
-        /// 获取目标类型
-        /// </summary>
-        public Type TargetType { get; }
-
-        /// <summary>
-        /// 获取目标类型对应的非空可类型
-        /// </summary>
-        public Type TargetNotNullType { get; }
-
-        /// <summary>
-        /// 获取目标类型是否为非空值类型
-        /// </summary>
-        public bool TargetIsNotNullValueType { get; }
+        public TypeInfo Target { get; }
 
         /// <summary>
         /// 转换上下文
@@ -52,16 +32,40 @@ namespace QMapper
         public Context(Expression value, Type targetType)
         {
             this.Value = value;
-            this.ValueType = value.Type;
-            this.TargetType = targetType;
+            this.Source = new TypeInfo(value.Type);
+            this.Target = new TypeInfo(targetType);
+        }
 
-            var valueUnderlyingType = Nullable.GetUnderlyingType(value.Type);
-            this.ValueNotNullType = valueUnderlyingType ?? value.Type;
-            this.ValueIsNotNullValueType = valueUnderlyingType == null && value.Type.GetTypeInfo().IsValueType;
+        /// <summary>
+        /// 表示类型信息
+        /// </summary>
+        public class TypeInfo
+        {
+            /// <summary>
+            /// 获取类型
+            /// </summary>
+            public Type Type { get; }
 
-            var targetUnderlyingType = Nullable.GetUnderlyingType(targetType);
-            this.TargetNotNullType = targetUnderlyingType ?? targetType;
-            this.TargetIsNotNullValueType = targetUnderlyingType == null && targetType.GetTypeInfo().IsValueType;
+            /// <summary>
+            /// 获取类型对应的非空类型
+            /// </summary>
+            public Type NotNullType { get; }
+
+            /// <summary>
+            /// 获取是否为值类型
+            /// </summary>
+            public bool IsValueType { get; }
+
+            /// <summary>
+            /// 类型信息
+            /// </summary>
+            /// <param name="type"></param>
+            public TypeInfo(Type type)
+            {
+                this.Type = type;
+                this.NotNullType = Nullable.GetUnderlyingType(type) ?? type;
+                this.IsValueType = type.GetTypeInfo().IsValueType;
+            }
         }
     }
 }

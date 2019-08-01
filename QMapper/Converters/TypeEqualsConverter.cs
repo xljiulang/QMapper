@@ -14,7 +14,7 @@ namespace QMapper
         /// <returns></returns>
         public override Expression Invoke(Context context)
         {
-            if (context.ValueType == context.TargetType)
+            if (context.Source.Type == context.Target.Type)
             {
                 return context.Value;
             }

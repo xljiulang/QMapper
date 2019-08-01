@@ -45,7 +45,7 @@ namespace QMapper
             var converters = new Converter[]
             {
                 new TypeEqualsConverter(),
-                new TypeAndNullableTypeConverter(),
+                new ValueTypeConverter(),
                 new StringTargetConverter(),
                 new EnumTargetConverter(),
                 new ConvertibleConverter()

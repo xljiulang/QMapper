@@ -16,15 +16,15 @@ namespace QMapper
         /// <returns></returns>
         public override Expression Invoke(Context context)
         {
-            if (context.TargetType != typeof(string))
+            if (context.Target.Type != typeof(string))
             {
                 return this.Next.Invoke(context);
             }
 
-            // 非空的值类型直接ToString()
-            if (context.ValueIsNotNullValueType == true)
+            // 值类型直接ToString()
+            if (context.Source.IsValueType == true)
             {
-                var toStringMethod = context.ValueType.GetMethod($"{nameof(ToString)}", new Type[0]);
+                var toStringMethod = context.Source.Type.GetMethod($"{nameof(ToString)}", new Type[0]);
                 return Expression.Call(context.Value, toStringMethod);
             }
 

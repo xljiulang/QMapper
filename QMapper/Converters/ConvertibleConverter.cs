@@ -15,28 +15,22 @@ namespace QMapper
         /// <returns></returns>
         public override Expression Invoke(Context context)
         {
-            if (context.ValueNotNullType.IsInheritFrom<IConvertible>() == false)
+            if (context.Source.NotNullType.IsInheritFrom<IConvertible>() == false)
             {
                 return this.Next.Invoke(context);
             }
 
-            if (context.TargetNotNullType.IsInheritFrom<IConvertible>() == false)
+            if (context.Target.NotNullType.IsInheritFrom<IConvertible>() == false)
             {
                 return this.Next.Invoke(context);
-            }
-
-            // 非空值类型之间相互转换 (int)(long value)
-            if (context.ValueIsNotNullValueType && context.TargetIsNotNullValueType)
-            {
-                return Expression.Convert(context.Value, context.TargetType);
             }
 
             var method = this.GetStaticMethod($"{nameof(ConverToConvertible)}");
             var valueArg = Expression.Convert(context.Value, typeof(object));
-            var targetTypeArg = Expression.Constant(context.TargetNotNullType);
+            var targetTypeArg = Expression.Constant(context.Target.NotNullType);
 
             var value = Expression.Call(null, method, valueArg, targetTypeArg);
-            return Expression.Convert(value, context.TargetType);
+            return Expression.Convert(value, context.Target.Type);
         }
 
         /// <summary>

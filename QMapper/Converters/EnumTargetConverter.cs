@@ -15,23 +15,23 @@ namespace QMapper
         /// <returns></returns>
         public override Expression Invoke(Context context)
         {
-            if (context.TargetNotNullType.IsInheritFrom<Enum>() == false)
+            if (context.Target.NotNullType.IsInheritFrom<Enum>() == false)
             {
                 return this.Next.Invoke(context);
             }
 
-            // (XXEnum)(int value)
-            if (context.ValueIsNotNullValueType == true)
+            // (XXEnum?)(int value)  (XXEnum)(int? value)  (XXEnum)(double value)
+            if (context.Source.IsValueType == true)
             {
-                return Expression.Convert(context.Value, context.TargetType);
+                return Expression.Convert(context.Value, context.Target.Type);
             }
 
             var method = this.GetStaticMethod($"{nameof(ConvertToEnum)}");
             var valueArg = Expression.Convert(context.Value, typeof(object));
-            var targetTypeArg = Expression.Constant(context.TargetNotNullType);
+            var targetTypeArg = Expression.Constant(context.Target.NotNullType);
 
             var value = Expression.Call(null, method, valueArg, targetTypeArg);
-            return Expression.Convert(value, context.TargetType);
+            return Expression.Convert(value, context.Target.Type);
         }
 
         /// <summary>

@@ -17,10 +17,10 @@ namespace QMapper
         {
             var method = this.GetStaticMethod($"{nameof(ConvertToType)}");
             var valueArg = Expression.Convert(context.Value, typeof(object));
-            var targetTypeArg = Expression.Constant(context.TargetNotNullType);
+            var targetTypeArg = Expression.Constant(context.Target.NotNullType);
 
             var value = Expression.Call(null, method, valueArg, targetTypeArg);
-            return Expression.Convert(value, context.TargetType);
+            return Expression.Convert(value, context.Target.Type);
         }
 
         /// <summary>

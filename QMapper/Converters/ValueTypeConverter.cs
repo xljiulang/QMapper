@@ -3,9 +3,9 @@
 namespace QMapper
 {
     /// <summary>
-    /// 源类型和目标类型为某类型及其可空类型
+    /// 值类型自动转换
     /// </summary>
-    class TypeAndNullableTypeConverter : Converter
+    class ValueTypeConverter : Converter
     {
         /// <summary>
         /// 执行转换
@@ -14,9 +14,9 @@ namespace QMapper
         /// <returns></returns>
         public override Expression Invoke(Context context)
         {
-            if (context.ValueNotNullType == context.TargetNotNullType)
+            if (context.Source.IsValueType && context.Target.IsValueType)
             {
-                return Expression.Convert(context.Value, context.TargetType);
+                return Expression.Convert(context.Value, context.Target.Type);
             }
 
             return this.Next.Invoke(context);

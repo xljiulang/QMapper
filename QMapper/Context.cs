@@ -57,6 +57,15 @@ namespace QMapper
             public bool IsValueType { get; }
 
             /// <summary>
+            /// 获取是否为非空的值类型
+            /// </summary>
+            public bool IsNotNullValueType
+            {
+                get => this.IsValueType && this.Type == this.NotNullType;
+            }
+
+
+            /// <summary>
             /// 类型信息
             /// </summary>
             /// <param name="type"></param>

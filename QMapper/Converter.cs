@@ -48,14 +48,15 @@ namespace QMapper
                 new ValueTypeConverter(),
                 new StringTargetConverter(),
                 new EnumTargetConverter(),
-                new ConvertibleConverter()
+                new ConvertibleConverter(),
+                new OthersTargetConverter()
             };
 
             converters.Aggregate((pre, next) =>
             {
                 pre.Next = next;
                 return next;
-            }).Next = new OthersTargetConverter();
+            }).Next = new NotSupportedConverter();
 
             converter = converters.First();
         }

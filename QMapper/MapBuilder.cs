@@ -110,9 +110,17 @@ namespace QMapper
             {
                 return new Map<TDestination>(this.source, this.includeMembers);
             }
+            catch (MapException)
+            {
+                throw;
+            }
             catch (TypeInitializationException ex)
             {
                 throw new MapException(typeof(TSource), typeof(TDestination), ex.InnerException);
+            }
+            catch (Exception ex)
+            {
+                throw new MapException(typeof(TSource), typeof(TDestination), ex);
             }
         }
 
@@ -137,6 +145,10 @@ namespace QMapper
             try
             {
                 return Map<TDestination>.DynamicMap(this.source, destination, this.includeMembers);
+            }
+            catch (MapException)
+            {
+                throw;
             }
             catch (TypeInitializationException ex)
             {
@@ -214,18 +226,11 @@ namespace QMapper
                     return null;
                 }
 
-                try
+                foreach (var item in this.mapItems)
                 {
-                    foreach (var item in this.mapItems)
-                    {
-                        item.Invoke(this.source, destination);
-                    }
-                    return destination;
+                    item.Invoke(this.source, destination);
                 }
-                catch (Exception ex)
-                {
-                    throw new MapException(typeof(TSource), typeof(TDestination), ex);
-                }
+                return destination;
             }
 
             /// <summary>

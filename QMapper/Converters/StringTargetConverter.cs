@@ -24,13 +24,13 @@ namespace QMapper
             // 值类型直接ToString()
             if (context.Source.IsValueType == true)
             {
-                var toStringMethod = context.Source.Type.GetMethod($"{nameof(ToString)}", new Type[0]);
+                var toStringMethod = context.Source.Type.GetMethod(nameof(ToString), new Type[0]);
                 return Expression.Call(context.Value, toStringMethod);
             }
 
-            var method = this.GetStaticMethod($"{nameof(ConvertToString)}");
-            var valueArg = Expression.Convert(context.Value, typeof(object));
-            return Expression.Call(null, method, valueArg);
+            var method = this.GetStaticMethod(nameof(ConvertToString));
+            var value = Expression.Convert(context.Value, typeof(object));
+            return Expression.Call(null, method, value);
         }
 
         /// <summary>

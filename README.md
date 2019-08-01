@@ -1,6 +1,8 @@
 # QMapper
 快、准、狠的Mapper组件
 
+    PM> install-package QMapper
+
 ### 约定和限制
 * 属性名称相同的才能映射
 * 属性名称大小写不敏感

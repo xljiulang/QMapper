@@ -20,8 +20,9 @@ namespace QMapper
         /// <summary>
         /// 映射异常
         /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="inner"></param>
+        /// <param name="sourceType">源类型</param>
+        /// <param name="destinationType">目标类型</param>
+        /// <param name="inner">内部异常</param>
         public MapException(Type sourceType, Type destinationType, Exception inner)
             : base(null, inner)
         {

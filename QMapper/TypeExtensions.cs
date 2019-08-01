@@ -6,7 +6,7 @@ namespace QMapper
     /// <summary>
     /// 类型扩展
     /// </summary>
-    public static class TypeExtensions
+    static class TypeExtensions
     {
         /// <summary>
         /// 是否可以从TBase类型派生
@@ -17,7 +17,7 @@ namespace QMapper
         public static bool IsInheritFrom<TBase>(this Type type)
         {
             return typeof(TBase).IsAssignableFrom(type);
-        }  
+        }
 
 #if !NETSTANDARD1_3
         /// <summary>
@@ -39,6 +39,6 @@ namespace QMapper
         {
             return type;
         }
-#endif 
+#endif
     }
 }

@@ -205,7 +205,6 @@ namespace QMapper
             /// <summary>
             /// 映射到目标对象     
             /// </summary>
-            /// <typeparam name="TDestination"></typeparam>
             /// <param name="destination">目标对象</param>
             /// <returns></returns>
             public TDestination MapTo(TDestination destination)

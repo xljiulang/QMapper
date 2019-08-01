@@ -68,7 +68,7 @@ namespace QMapper
 
             var value = Expression.Variable(context.Target.Type, "value");
             var condition = Expression.IfThenElse(
-                Expression.Equal(context.Value, Expression.Constant(null, context.Target.Type)),
+                Expression.Equal(context.Value, Expression.Constant(null, context.Source.Type)),
                 Expression.IfThenElse(Expression.IsFalse(
                     Expression.Constant(context.Target.IsNotNullValueType)),
                     Expression.Assign(value, Expression.Constant(null, context.Target.Type)),

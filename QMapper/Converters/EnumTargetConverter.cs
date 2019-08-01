@@ -26,7 +26,7 @@ namespace QMapper
                 return Expression.Convert(context.Value, context.Target.Type);
             }
 
-            var checkNull = this.CheckNullValue(context);
+            var checkNull = this.CheckNullValueSupported(context);
             var callConvert = this.CallStaticConvert(context, nameof(ConvertToEnum));
             return Expression.Block(checkNull, callConvert);
         }
@@ -40,6 +40,10 @@ namespace QMapper
         /// <returns></returns>
         private static object ConvertToEnum(object value, Type targetNotNullType)
         {
+            if (value == null)
+            {
+                return null;
+            }
             return Enum.Parse(targetNotNullType, value.ToString(), true);
         }
     }

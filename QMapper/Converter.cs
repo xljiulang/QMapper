@@ -53,11 +53,11 @@ namespace QMapper
         }
 
         /// <summary>
-        /// 检测null值
+        /// 检测null值是否被支持
         /// </summary>
         /// <param name="context">上下文</param>
         /// <returns></returns>
-        protected ConditionalExpression CheckNullValue(Context context)
+        protected ConditionalExpression CheckNullValueSupported(Context context)
         {
             return Expression.IfThen(
                 Expression.Equal(context.Value, Expression.Constant(null)),

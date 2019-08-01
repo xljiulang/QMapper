@@ -28,23 +28,23 @@ namespace QMapper
         /// 为指定目标类型编译映射
         /// 返回编译后的映射
         /// </summary>
-        /// <typeparam name="TDestination"></typeparam>
+        /// <typeparam name="TTarget">目标类型</typeparam>
         /// <returns></returns>
-        IMap<TSource, TDestination> Compile<TDestination>() where TDestination : class;
+        IMap<TSource, TTarget> Compile<TTarget>() where TTarget : class;
 
         /// <summary>
         /// 映射到目标对象      
         /// </summary>
-        /// <typeparam name="TDestination"></typeparam>     
+        /// <typeparam name="TTarget">目标类型</typeparam>     
         /// <returns></returns>
-        TDestination To<TDestination>() where TDestination : class, new();
+        TTarget To<TTarget>() where TTarget : class, new();
 
         /// <summary>
         /// 映射到目标对象     
         /// </summary>
-        /// <typeparam name="TDestination"></typeparam>
-        /// <param name="destination">目标对象</param>
+        /// <typeparam name="TTarget">目标类型</typeparam>
+        /// <param name="target">目标对象</param>
         /// <returns></returns>
-        TDestination To<TDestination>(TDestination destination) where TDestination : class;
+        TTarget To<TTarget>(TTarget target) where TTarget : class;
     }
 }

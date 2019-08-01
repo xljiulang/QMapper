@@ -5,14 +5,14 @@
     /// 提供对相同名称的属性进行映射
     /// </summary>
     /// <typeparam name="TSource">源类型</typeparam>
-    /// <typeparam name="TDestination">目标类型</typeparam>
-    public interface IMap<TSource, TDestination> where TSource : class
+    /// <typeparam name="TTarget">目标类型</typeparam>
+    public interface IMap<TSource, TTarget> where TSource : class
     {
         /// <summary>
         /// 映射到目标对象
         /// </summary>
-        /// <param name="destination">目标对象</param>
+        /// <param name="target">目标对象</param>
         /// <returns></returns>
-        TDestination MapTo(TDestination destination);
+        TTarget MapTo(TTarget target);
     }
 }

@@ -11,6 +11,11 @@ namespace QMapper
     abstract class Converter
     {
         /// <summary>
+        /// 转换器实例
+        /// </summary>
+        private static readonly Converter converter;
+
+        /// <summary>
         /// 下一个转换器
         /// </summary>
         public Converter Next { get; set; }
@@ -22,20 +27,6 @@ namespace QMapper
         /// <returns></returns>
         public abstract Expression Invoke(Context context);
 
-        /// <summary>
-        /// 获取本类型声明的静态方法
-        /// </summary>
-        /// <param name="name">方法名</param>
-        /// <returns></returns>
-        protected MethodInfo GetStaticMethod(string name)
-        {
-            return this.GetType().GetMethod(name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-        }
-
-        /// <summary>
-        /// 转换器实例
-        /// </summary>
-        private static readonly Converter converter;
 
         /// <summary>
         /// 静态构造器
@@ -62,14 +53,45 @@ namespace QMapper
         }
 
         /// <summary>
+        /// 检测null值
+        /// </summary>
+        /// <param name="context">上下文</param>
+        /// <returns></returns>
+        protected ConditionalExpression CheckNullValue(Context context)
+        {
+            return Expression.IfThen(
+                Expression.Equal(context.Value, Expression.Constant(null)),
+                    Expression.IfThenElse(
+                        Expression.IsFalse(Expression.Constant(context.Target.IsNotNullValueType)),
+                            Expression.Constant(null),
+                            Expression.Throw(Expression.Constant(new NotSupportedException($"不支持null值的{context.Source.Info} 转换为{context.Target.Info}")))
+                ));
+        }
+
+        /// <summary>
+        /// 调用静态转换方法
+        /// object ConvertMethod(object value, Type targetNotNullType)
+        /// </summary>
+        /// <param name="context">上下文</param>
+        /// <param name="methodName">转换方法名</param>
+        /// <returns></returns>
+        protected Expression CallStaticConvert(Context context, string methodName)
+        {
+            var method = this.GetType().GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            var value = Expression.Convert(context.Value, typeof(object));
+            var targetType = Expression.Constant(context.Target.NotNullType);
+
+            var result = Expression.Call(null, method, value, targetType);
+            return Expression.Convert(result, context.Target.Type);
+        }
+
+        /// <summary>
         /// 表达式类型转换
         /// </summary>
-        /// <param name="value">值</param>
-        /// <param name="targetType">目标类型</param>
+        /// <param name="context">上下文</param>
         /// <returns></returns>
-        public static Expression Convert(Expression value, Type targetType)
+        public static Expression Convert(Context context)
         {
-            var context = new Context(value, targetType);
             return converter.Invoke(context);
         }
     }

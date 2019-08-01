@@ -102,13 +102,13 @@ namespace QMapper
         /// 为指定目标类型编译映射
         /// 返回编译后的映射
         /// </summary>
-        /// <typeparam name="TDestination"></typeparam>
+        /// <typeparam name="TTarget">目标类型</typeparam>
         /// <returns></returns>
-        public IMap<TSource, TDestination> Compile<TDestination>() where TDestination : class
+        public IMap<TSource, TTarget> Compile<TTarget>() where TTarget : class
         {
             try
             {
-                return new Map<TDestination>(this.source, this.includeMembers);
+                return new Map<TTarget>(this.source, this.includeMembers);
             }
             catch (MapException)
             {
@@ -116,35 +116,35 @@ namespace QMapper
             }
             catch (TypeInitializationException ex)
             {
-                throw new MapException(typeof(TSource), typeof(TDestination), ex.InnerException);
+                throw new MapException(typeof(TSource), typeof(TTarget), ex.InnerException);
             }
             catch (Exception ex)
             {
-                throw new MapException(typeof(TSource), typeof(TDestination), ex);
+                throw new MapException(typeof(TSource), typeof(TTarget), ex);
             }
         }
 
         /// <summary>
         /// 映射到目标对象      
         /// </summary>
-        /// <typeparam name="TDestination"></typeparam>     
+        /// <typeparam name="TTarget">TTarget</typeparam>     
         /// <returns></returns>
-        public TDestination To<TDestination>() where TDestination : class, new()
+        public TTarget To<TTarget>() where TTarget : class, new()
         {
-            return this.To(new TDestination());
+            return this.To(new TTarget());
         }
 
         /// <summary>
         /// 映射到目标对象       
         /// </summary>
-        /// <typeparam name="TDestination"></typeparam>
-        /// <param name="destination">目标对象</param>
+        /// <typeparam name="TTarget"></typeparam>
+        /// <param name="target">目标对象</param>
         /// <returns></returns>
-        public TDestination To<TDestination>(TDestination destination) where TDestination : class
+        public TTarget To<TTarget>(TTarget target) where TTarget : class
         {
             try
             {
-                return Map<TDestination>.DynamicMap(this.source, destination, this.includeMembers);
+                return Map<TTarget>.DynamicMap(this.source, target, this.includeMembers);
             }
             catch (MapException)
             {
@@ -152,19 +152,19 @@ namespace QMapper
             }
             catch (TypeInitializationException ex)
             {
-                throw new MapException(typeof(TSource), typeof(TDestination), ex.InnerException);
+                throw new MapException(typeof(TSource), typeof(TTarget), ex.InnerException);
             }
             catch (Exception ex)
             {
-                throw new MapException(typeof(TSource), typeof(TDestination), ex);
+                throw new MapException(typeof(TSource), typeof(TTarget), ex);
             }
         }
 
         /// <summary>
         /// 表示对象映射
         /// </summary>
-        /// <typeparam name="TDestination"></typeparam>
-        private class Map<TDestination> : IMap<TSource, TDestination> where TDestination : class
+        /// <typeparam name="TTarget">目标类型</typeparam>
+        private class Map<TTarget> : IMap<TSource, TTarget> where TTarget : class
         {
             /// <summary>
             /// 所有映射属性
@@ -177,9 +177,9 @@ namespace QMapper
             static Map()
             {
                 var q = from s in sourceProperies
-                        join d in typeof(TDestination).GetProperties()
-                        on s.Name.ToLower() equals d.Name.ToLower()
-                        let map = new MapItem(s, d)
+                        join t in typeof(TTarget).GetProperties()
+                        on s.Name.ToLower() equals t.Name.ToLower()
+                        let map = new MapItem(s, t)
                         where map.IsEnable
                         select map;
 
@@ -217,32 +217,32 @@ namespace QMapper
             /// <summary>
             /// 映射到目标对象     
             /// </summary>
-            /// <param name="destination">目标对象</param>
+            /// <param name="target">目标对象</param>
             /// <returns></returns>
-            public TDestination MapTo(TDestination destination)
+            public TTarget MapTo(TTarget target)
             {
-                if (destination == null)
+                if (target == null)
                 {
                     return null;
                 }
 
                 foreach (var item in this.mapItems)
                 {
-                    item.Invoke(this.source, destination);
+                    item.Invoke(this.source, target);
                 }
-                return destination;
+                return target;
             }
 
             /// <summary>
             /// 动态映射
             /// </summary>
             /// <param name="source">源</param>
-            /// <param name="destination">目标</param>
+            /// <param name="target">目标</param>
             /// <param name="members">映射的属性</param>
             /// <returns></returns>
-            public static TDestination DynamicMap(TSource source, TDestination destination, HashSet<string> members)
+            public static TTarget DynamicMap(TSource source, TTarget target, HashSet<string> members)
             {
-                if (destination == null)
+                if (target == null)
                 {
                     return null;
                 }
@@ -251,7 +251,7 @@ namespace QMapper
                 {
                     foreach (var item in allMapItems)
                     {
-                        item.Invoke(source, destination);
+                        item.Invoke(source, target);
                     }
                 }
                 else
@@ -260,12 +260,12 @@ namespace QMapper
                     {
                         if (members.Contains(item.Name) == true)
                         {
-                            item.Invoke(source, destination);
+                            item.Invoke(source, target);
                         }
                     }
                 }
 
-                return destination;
+                return target;
             }
 
 
@@ -277,7 +277,7 @@ namespace QMapper
                 /// <summary>
                 /// 映射委托
                 /// </summary>
-                private readonly Action<TSource, TDestination> action;
+                private readonly Action<TSource, TTarget> action;
 
                 /// <summary>
                 /// 获取属性名称
@@ -290,49 +290,61 @@ namespace QMapper
                 public bool IsEnable { get; }
 
                 /// <summary>
+                /// 获取源属性
+                /// </summary>
+                public PropertyInfo SourceProperty { get; }
+
+                /// <summary>
+                /// 获取目标属性
+                /// </summary>
+                public PropertyInfo TargetProperty { get; }
+
+                /// <summary>
                 /// 映射属性
                 /// </summary>
-                /// <param name="propertySource">源属性</param>
-                /// <param name="propertyDestination">目标属性</param>
-                public MapItem(PropertyInfo propertySource, PropertyInfo propertyDestination)
+                /// <param name="sourceProperty">源属性</param>
+                /// <param name="targetProperty">目标属性</param>
+                public MapItem(PropertyInfo sourceProperty, PropertyInfo targetProperty)
                 {
-                    this.action = CreateAction(propertySource, propertyDestination);
-                    this.Name = propertySource.Name;
+                    this.SourceProperty = sourceProperty;
+                    this.TargetProperty = targetProperty;
+                    this.Name = sourceProperty.Name;
+
+                    this.action = this.CreateAction();
                     this.IsEnable = this.action != null;
                 }
 
                 /// <summary>
                 /// 创建映射委托
-                /// (source,destination) => destination.Name = source.Name;
+                /// (source,target) => target.Name = source.Name;
                 /// </summary>                  
-                /// <param name="propertySource">源属性</param>
-                /// <param name="propertyDestination">目标属性</param>
                 /// <returns></returns>
-                private static Action<TSource, TDestination> CreateAction(PropertyInfo propertySource, PropertyInfo propertyDestination)
+                private Action<TSource, TTarget> CreateAction()
                 {
-                    if (propertySource.GetGetMethod() == null || propertyDestination.GetSetMethod() == null)
+                    if (this.SourceProperty.GetGetMethod() == null || this.TargetProperty.GetSetMethod() == null)
                     {
                         return null;
                     }
 
                     var source = Expression.Parameter(typeof(TSource), "source");
-                    var destination = Expression.Parameter(typeof(TDestination), "destination");
+                    var target = Expression.Parameter(typeof(TTarget), "target");
 
-                    var value = Expression.Property(source, propertySource);
-                    var valueCasted = Converter.Convert(value, propertyDestination.PropertyType);
+                    var value = Expression.Property(source, this.SourceProperty);
+                    var context = new Context(value, this.SourceProperty, this.TargetProperty);
+                    var valueCasted = Converter.Convert(context);
 
-                    var body = Expression.Assign(Expression.Property(destination, propertyDestination), valueCasted);
-                    return Expression.Lambda<Action<TSource, TDestination>>(body, source, destination).Compile();
+                    var body = Expression.Assign(Expression.Property(target, this.TargetProperty), valueCasted);
+                    return Expression.Lambda<Action<TSource, TTarget>>(body, source, target).Compile();
                 }
 
                 /// <summary>
                 /// 执行映射
                 /// </summary>
                 /// <param name="source">源</param>
-                /// <param name="destination">目标</param>
-                public void Invoke(TSource source, TDestination destination)
+                /// <param name="target">目标</param>
+                public void Invoke(TSource source, TTarget target)
                 {
-                    this.action.Invoke(source, destination);
+                    this.action.Invoke(source, target);
                 }
 
                 /// <summary>

@@ -26,13 +26,9 @@ namespace QMapper
                 return this.Next.Invoke(context);
             }
 
-            var method = this.GetStaticMethod(nameof(ConvertToType));
-            var value = Expression.Convert(context.Value, typeof(object));
-            var targetType = Expression.Constant(context.Target.Type);
-            var targetIsNotNullValueType = Expression.Constant(context.Target.IsNotNullValueType);
-
-            var result = Expression.Call(null, method, value, targetType, targetIsNotNullValueType);
-            return Expression.Convert(result, context.Target.Type);
+            var checkNull = this.CheckNullValue(context);
+            var callConvert = this.CallStaticConvert(context, nameof(ConvertToType));
+            return Expression.Block(checkNull, callConvert);
         }
 
         /// <summary>
@@ -40,21 +36,10 @@ namespace QMapper
         /// </summary>
         /// <param name="value">要转换的值</param>
         /// <param name="targetNotNullType">转换的目标类型</param>
-        /// <param name="targetIsNotNullValueType">目标类型为非空值类型</param>
-        /// <exception cref="NotSupportedException"></exception>
         /// <exception cref="NotImplementedException"></exception>
         /// <returns></returns>
-        private static object ConvertToType(object value, Type targetNotNullType, bool targetIsNotNullValueType)
+        private static object ConvertToType(object value, Type targetNotNullType)
         {
-            if (value == null)
-            {
-                if (targetIsNotNullValueType == false)
-                {
-                    return null;
-                }
-                throw new NotSupportedException($"不支持null值转换为{targetNotNullType}");
-            }
-
             if (typeof(Guid) == targetNotNullType)
             {
                 return Guid.Parse(value.ToString());

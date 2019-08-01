@@ -28,7 +28,7 @@ namespace QMapper
                 return Expression.Call(context.Value, toStringMethod);
             }
 
-            var method = this.GetStaticMethod(nameof(ConvertToString));
+            var method = this.GetType().GetMethod(nameof(ConvertToString), BindingFlags.Static | BindingFlags.NonPublic);
             var value = Expression.Convert(context.Value, typeof(object));
             return Expression.Call(null, method, value);
         }

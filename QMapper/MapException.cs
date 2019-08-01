@@ -15,19 +15,19 @@ namespace QMapper
         /// <summary>
         /// 获取目标类型
         /// </summary>
-        public Type DestinationType { get; }
+        public Type TargetType { get; }
 
         /// <summary>
         /// 映射异常
         /// </summary>
         /// <param name="sourceType">源类型</param>
-        /// <param name="destinationType">目标类型</param>
+        /// <param name="targetType">目标类型</param>
         /// <param name="inner">内部异常</param>
-        public MapException(Type sourceType, Type destinationType, Exception inner)
+        public MapException(Type sourceType, Type targetType, Exception inner)
             : base(null, inner)
         {
             this.SourceType = sourceType;
-            this.DestinationType = destinationType;
+            this.TargetType = targetType;
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace QMapper
         /// </summary>
         public override string Message
         {
-            get => $"类型{this.SourceType}转换为{this.DestinationType}失败";
+            get => $"类型{this.SourceType}转换为{this.TargetType}失败";
         }
     }
 }

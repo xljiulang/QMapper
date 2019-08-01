@@ -6,6 +6,7 @@
     <Authors>xljiulang</Authors>
     <Description>快、准、狠的Mapper组件</Description>
     <Copyright>xljiulang</Copyright>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <PackageProjectUrl>https://github.com/xljiulang/QMapper</PackageProjectUrl>
     <Version>0.2.0</Version>
   </PropertyGroup>

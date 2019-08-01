@@ -26,9 +26,8 @@ namespace QMapper
                 return this.Next.Invoke(context);
             }
 
-            var checkNull = this.CheckNullValueSupported(context);
-            var callConvert = this.CallStaticConvert(context, nameof(ConvertToType));
-            return Expression.Block(checkNull, callConvert);
+            var value = this.CallStaticConvert(context, nameof(ConvertToType));
+            return this.IfValueIsNotNullThen(context, value);
         }
 
         /// <summary>
@@ -48,11 +47,6 @@ namespace QMapper
             if (typeof(DateTimeOffset) == targetNotNullType)
             {
                 return DateTimeOffset.Parse(value.ToString());
-            }
-
-            if (value == null)
-            {
-                return null;
             }
 
             if (typeof(Uri) == targetNotNullType)

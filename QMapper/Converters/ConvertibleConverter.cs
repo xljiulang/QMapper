@@ -25,9 +25,8 @@ namespace QMapper
                 return this.Next.Invoke(context);
             }
 
-            var checkNull = this.CheckNullValueSupported(context);
-            var callConvert = this.CallStaticConvert(context, nameof(ConverToConvertible));
-            return Expression.Block(checkNull, callConvert);
+            var value = this.CallStaticConvert(context, nameof(ConverToConvertible));
+            return this.IfValueIsNotNullThen(context, value);
         }
 
         /// <summary>
@@ -38,10 +37,6 @@ namespace QMapper
         /// <returns></returns>
         private static object ConverToConvertible(object value, Type targetNotNullType)
         {
-            if (value == null)
-            {
-                return null;
-            }
             var convertible = value as IConvertible;
             return convertible.ToType(targetNotNullType, null);
         }

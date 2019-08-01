@@ -53,19 +53,31 @@ namespace QMapper
         }
 
         /// <summary>
-        /// 检测null值是否被支持
+        /// 检测如果值不为null则使用then值
+        /// 则否根据目标类型返回null或抛出不支持的异常
         /// </summary>
         /// <param name="context">上下文</param>
+        /// <param name="thenValue"></param>
         /// <returns></returns>
-        protected ConditionalExpression CheckNullValueSupported(Context context)
+        protected Expression IfValueIsNotNullThen(Context context, Expression thenValue)
         {
-            return Expression.IfThen(
-                Expression.Equal(context.Value, Expression.Constant(null)),
-                    Expression.IfThenElse(
-                        Expression.IsFalse(Expression.Constant(context.Target.IsNotNullValueType)),
-                            Expression.Constant(null),
-                            Expression.Throw(Expression.Constant(new NotSupportedException($"不支持null值的{context.Source.Info} 转换为{context.Target.Info}")))
-                ));
+            if (context.Source.IsNotNullValueType == true)
+            {
+                return thenValue;
+            }
+
+            var value = Expression.Variable(context.Target.Type, "value");
+            var condition = Expression.IfThenElse(
+                Expression.Equal(context.Value, Expression.Constant(null, context.Target.Type)),
+                Expression.IfThenElse(Expression.IsFalse(
+                    Expression.Constant(context.Target.IsNotNullValueType)),
+                    Expression.Assign(value, Expression.Constant(null, context.Target.Type)),
+                    Expression.Throw(Expression.Constant(new NotSupportedException($"不支持null值的{context.Source.Info}转换为{context.Target.Info}")))
+                ),
+                Expression.Assign(value, thenValue)
+            );
+
+            return Expression.Block(new ParameterExpression[] { value }, condition, value);
         }
 
         /// <summary>

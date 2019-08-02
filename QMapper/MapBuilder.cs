@@ -10,7 +10,7 @@ namespace QMapper
     /// 映射创建者
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
-    class MapBuilder<TSource> : IMapBuilder<TSource> where TSource : class
+    class MapBuilder<TSource> : ICompileMapBuilder<TSource>, IDynamicMapBuilder<TSource> where TSource : class
     {
         /// <summary>
         /// 数据源
@@ -34,24 +34,29 @@ namespace QMapper
 
 
         /// <summary>
-        /// 映射创建者
+        /// 构建编译形映射创建者
         /// </summary>
-        /// <param name="source">数据源</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public MapBuilder(TSource source)
+        public MapBuilder()
         {
-            this.source = source ?? throw new ArgumentNullException(nameof(source));
         }
 
         /// <summary>
-        /// 映射创建者
+        /// 构建动态映射创建者
+        /// </summary>
+        /// <param name="source">数据源</param>
+        public MapBuilder(TSource source)
+        {
+            this.source = source;
+        }
+
+        /// <summary>
+        /// 构建动态映射创建者
         /// </summary>
         /// <param name="source">数据源</param>
         /// <param name="includeMembers">映射的的属性名称</param>
-        /// <exception cref="ArgumentNullException"></exception>
         public MapBuilder(TSource source, IEnumerable<string> includeMembers)
         {
-            this.source = source ?? throw new ArgumentNullException(nameof(source));
+            this.source = source;
             this.includeMembers = new HashSet<string>(includeMembers, StringComparer.OrdinalIgnoreCase);
         }
 
@@ -60,9 +65,54 @@ namespace QMapper
         /// </summary>
         /// <typeparam name="TKey"></typeparam>
         /// <param name="ignoreKey">忽略的字段</param>
-        /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
-        public IMapBuilder<TSource> Ignore<TKey>(Expression<Func<TSource, TKey>> ignoreKey)
+        ICompileMapBuilder<TSource> ICompileMapBuilder<TSource>.Ignore<TKey>(Expression<Func<TSource, TKey>> ignoreKey)
+        {
+            this.Ignore<TKey>(ignoreKey);
+            return this;
+        }
+
+        /// <summary>
+        /// 忽略映射的字段
+        /// </summary>
+        /// <param name="memberName">忽略的字段</param>
+        /// <returns></returns>
+        ICompileMapBuilder<TSource> ICompileMapBuilder<TSource>.Ignore(params string[] memberName)
+        {
+            this.Ignore(memberName);
+            return this;
+        }
+
+        /// <summary>
+        /// 忽略映射的字段
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="ignoreKey">忽略的字段</param>
+        /// <returns></returns>
+        IDynamicMapBuilder<TSource> IDynamicMapBuilder<TSource>.Ignore<TKey>(Expression<Func<TSource, TKey>> ignoreKey)
+        {
+            this.Ignore<TKey>(ignoreKey);
+            return this;
+        }
+
+        /// <summary>
+        /// 忽略映射的字段
+        /// </summary>
+        /// <param name="memberName">忽略的字段</param>
+        /// <returns></returns>
+        IDynamicMapBuilder<TSource> IDynamicMapBuilder<TSource>.Ignore(params string[] memberName)
+        {
+            this.Ignore(memberName);
+            return this;
+        }
+
+        /// <summary>
+        /// 忽略映射的字段
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <param name="ignoreKey">忽略的字段</param>
+        /// <exception cref="ArgumentNullException"></exception>        
+        private void Ignore<TKey>(Expression<Func<TSource, TKey>> ignoreKey)
         {
             if (ignoreKey == null)
             {
@@ -73,16 +123,13 @@ namespace QMapper
             {
                 this.Ignore(body.Member.Name);
             }
-
-            return this;
         }
 
         /// <summary>
         /// 忽略映射的字段
         /// </summary>
-        /// <param name="memberName">忽略的字段</param>
-        /// <returns></returns>
-        public IMapBuilder<TSource> Ignore(params string[] memberName)
+        /// <param name="memberName">忽略的字段</param>      
+        private void Ignore(params string[] memberName)
         {
             if (this.includeMembers == null)
             {
@@ -93,10 +140,7 @@ namespace QMapper
             {
                 this.includeMembers.Remove(item);
             }
-
-            return this;
         }
-
 
         /// <summary>
         /// 为指定目标类型编译映射
@@ -104,11 +148,11 @@ namespace QMapper
         /// </summary>
         /// <typeparam name="TTarget">目标类型</typeparam>
         /// <returns></returns>
-        public IMap<TSource, TTarget> Compile<TTarget>() where TTarget : class
+        public IMapper<TSource, TTarget> Compile<TTarget>() where TTarget : class
         {
             try
             {
-                return new Map<TTarget>(this.source, this.includeMembers);
+                return new Mapper<TTarget>(this.includeMembers);
             }
             catch (MapException)
             {
@@ -144,7 +188,7 @@ namespace QMapper
         {
             try
             {
-                return Map<TTarget>.DynamicMap(this.source, target, this.includeMembers);
+                return Mapper<TTarget>.DynamicMap(this.source, target, this.includeMembers);
             }
             catch (MapException)
             {
@@ -164,7 +208,7 @@ namespace QMapper
         /// 表示对象映射
         /// </summary>
         /// <typeparam name="TTarget">目标类型</typeparam>
-        private class Map<TTarget> : IMap<TSource, TTarget> where TTarget : class
+        private class Mapper<TTarget> : IMapper<TSource, TTarget> where TTarget : class
         {
             /// <summary>
             /// 所有映射属性
@@ -174,7 +218,7 @@ namespace QMapper
             /// <summary>
             /// 静态构造器
             /// </summary>
-            static Map()
+            static Mapper()
             {
                 var q = from s in sourceProperies
                         join t in typeof(TTarget).GetProperties()
@@ -187,11 +231,6 @@ namespace QMapper
             }
 
             /// <summary>
-            /// 源实例
-            /// </summary>
-            private readonly TSource source;
-
-            /// <summary>
             /// 要映射的属性
             /// </summary>
             private readonly MapItem[] mapItems;
@@ -199,11 +238,9 @@ namespace QMapper
             /// <summary>
             /// 对象映射
             /// </summary>
-            /// <param name="source">源实例</param>
             /// <param name="members">映射的字段</param>
-            public Map(TSource source, ICollection<string> members)
+            public Mapper(ICollection<string> members)
             {
-                this.source = source;
                 if (members == null)
                 {
                     this.mapItems = allMapItems;
@@ -215,21 +252,23 @@ namespace QMapper
             }
 
             /// <summary>
-            /// 映射到目标对象     
+            /// 映射到目标对象
             /// </summary>
+            /// <param name="source">源对象</param>
             /// <param name="target">目标对象</param>
             /// <returns></returns>
-            public TTarget MapTo(TTarget target)
+            public TTarget Map(TSource source, TTarget target)
             {
-                if (target == null)
+                if (source == null || target == null)
                 {
-                    return null;
+                    return target;
                 }
 
                 foreach (var item in this.mapItems)
                 {
-                    item.Invoke(this.source, target);
+                    item.Invoke(source, target);
                 }
+
                 return target;
             }
 

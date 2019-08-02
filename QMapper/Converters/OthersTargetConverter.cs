@@ -17,17 +17,20 @@ namespace QMapper
         {
             if (context.Target.NotNullType == typeof(Guid))
             {
-                return this.CallStaticConvertIfNotNull(context, nameof(ConvertToGuid));
+                var thenValue = this.CallConvertMethod(nameof(ConvertToGuid), context);
+                return context.IfValueNotNullThen(thenValue);
             }
 
             if (context.Target.NotNullType == typeof(DateTimeOffset))
             {
-                return this.CallStaticConvertIfNotNull(context, nameof(ConvertToDateTimeOffset));
+                var thenValue = this.CallConvertMethod(nameof(ConvertToDateTimeOffset), context);
+                return context.IfValueNotNullThen(thenValue);
             }
 
             if (context.Target.NotNullType == typeof(Uri) || context.Target.NotNullType == typeof(Version))
             {
-                return this.CallStaticConvertIfNotNull(context, nameof(ConvertToType));
+                var thenValue = this.CallConvertMethod(nameof(ConvertToType), context);
+                return context.IfValueNotNullThen(thenValue);
             }
 
             return this.Next.Invoke(context);
@@ -37,10 +40,9 @@ namespace QMapper
         /// 将value转换为目标类型
         /// </summary>
         /// <param name="value">要转换的值</param>
-        /// <param name="targetNotNullType">转换的目标类型</param>
         /// <exception cref="NotImplementedException"></exception>
         /// <returns></returns>
-        private static Guid ConvertToGuid(object value, Type targetNotNullType)
+        private static Guid ConvertToGuid(object value)
         {
             return Guid.Parse(value.ToString());
         }
@@ -49,10 +51,9 @@ namespace QMapper
         /// 将value转换为目标类型
         /// </summary>
         /// <param name="value">要转换的值</param>
-        /// <param name="targetNotNullType">转换的目标类型</param>
         /// <exception cref="NotImplementedException"></exception>
         /// <returns></returns>
-        private static DateTimeOffset ConvertToDateTimeOffset(object value, Type targetNotNullType)
+        private static DateTimeOffset ConvertToDateTimeOffset(object value)
         {
             return DateTimeOffset.Parse(value.ToString());
         }

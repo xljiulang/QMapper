@@ -25,19 +25,19 @@ namespace QMapper
                 return this.Next.Invoke(context);
             }
 
-            return this.CallStaticConvertIfNotNull(context, nameof(ConverToConvertible)); ;
+            var thenValue = this.CallConvertMethod(nameof(ConverToConvertible), context);
+            return context.IfValueNotNullThen(thenValue);
         }
-
+        
         /// <summary>
         /// 将IConvertible转换为IConvertible类型
         /// </summary>
         /// <param name="value"></param>
         /// <param name="targetNotNullType"></param>
         /// <returns></returns>
-        private static object ConverToConvertible(object value, Type targetNotNullType)
-        {
-            var convertible = value as IConvertible;
-            return convertible.ToType(targetNotNullType, null);
+        private static object ConverToConvertible(IConvertible value, Type targetNotNullType)
+        { 
+            return value.ToType(targetNotNullType, null);
         }
     }
 }

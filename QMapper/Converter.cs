@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -63,63 +63,38 @@ namespace QMapper
         }
 
         /// <summary>
-        /// 检测如果值不为null则调用转换方法
-        /// 则否根据目标类型返回null或抛出不支持的异常
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="convertMethodName">转换方法</param>
-        /// <returns></returns>
-        protected Expression CallStaticConvertIfNotNull(Context context, string convertMethodName)
-        {
-            var value = this.CallStaticConvert(context, convertMethodName);
-            return this.IfValueIsNotNullThen(context, value);
-        }
-
-        /// <summary>
         /// 调用静态转换方法
-        /// object ConvertMethod(object value, Type targetNotNullType)
+        /// TResult ConvertMethod(TValue value, Type targetNotNullType)
+        /// 第一个参数为context.Value，第二个方法为目标类型的非空类型
         /// </summary>
+        /// <param name="methodName">转换方法</param>
         /// <param name="context">上下文</param>
-        /// <param name="methodName">转换方法名</param>
         /// <returns></returns>
-        private Expression CallStaticConvert(Context context, string methodName)
+        protected Expression CallConvertMethod(string methodName, Context context)
         {
             var method = this.GetType().GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-            var value = Expression.Convert(context.Value, typeof(object));
-            var targetType = Expression.Constant(context.Target.NotNullType);
+            var parameters = method.GetParameters();
+            var args = new Expression[parameters.Length];
 
-            var result = Expression.Call(null, method, value, targetType);
-            return result.Type == context.Target.Type ? result : (Expression)Expression.Convert(result, context.Target.Type);
-        }
+            Debug.Assert(args.Length == 1 || args.Length == 2);
 
-        /// <summary>
-        /// 检测如果值不为null则使用then值
-        /// 则否根据目标类型返回null或抛出不支持的异常
-        /// </summary>
-        /// <param name="context">上下文</param>
-        /// <param name="thenValue"></param>
-        /// <returns></returns>
-        private Expression IfValueIsNotNullThen(Context context, Expression thenValue)
-        {
-            if (context.Source.IsNotNullValueType == true)
+            var valueArgType = parameters[0].ParameterType;
+            if (context.Source.Type == valueArgType)
             {
-                return thenValue;
+                args[0] = context.Value;
+            }
+            else
+            {
+                args[0] = Expression.Convert(context.Value, valueArgType);
             }
 
-            var value = Expression.Variable(context.Target.Type, "value");
-            var exception = new NotSupportedException($"不支持null值的{context.Source.Info}转换为{context.Target.Info}");
+            if (parameters.Length == 2)
+            {
+                args[1] = Expression.Constant(context.Target.NotNullType);
+            }
 
-            var condition = Expression.IfThenElse(
-                Expression.Equal(context.Value, Expression.Default(context.Source.Type)),
-                Expression.IfThenElse(Expression.IsTrue(
-                    Expression.Constant(context.Target.IsNotNullValueType)),
-                    Expression.Throw(Expression.Constant(exception)),
-                    Expression.Assign(value, Expression.Default(context.Target.Type))
-                ),
-                Expression.Assign(value, thenValue)
-            );
-
-            return Expression.Block(new ParameterExpression[] { value }, condition, value);
+            var result = Expression.Call(null, method, args);
+            return result.Type == context.Target.Type ? result : (Expression)Expression.Convert(result, context.Target.Type);
         }
     }
 }

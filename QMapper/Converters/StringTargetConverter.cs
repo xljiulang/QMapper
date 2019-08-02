@@ -21,27 +21,9 @@ namespace QMapper
                 return this.Next.Invoke(context);
             }
 
-            // 值类型直接ToString()
-            if (context.Source.IsValueType == true)
-            {
-                var toStringMethod = context.Source.Type.GetMethod(nameof(ToString), new Type[0]);
-                return Expression.Call(context.Value, toStringMethod);
-            }
-
-            var method = this.GetType().GetMethod(nameof(ConvertToString), BindingFlags.Static | BindingFlags.NonPublic);
-            var value = Expression.Convert(context.Value, typeof(object));
-            return Expression.Call(null, method, value);
-        }
-
-        /// <summary>
-        /// 将value转换为string类型
-        /// </summary>
-        /// <param name="value">要转换的值</param>
-        /// <exception cref="NotSupportedException"></exception>
-        /// <returns></returns>
-        private static string ConvertToString(object value)
-        {
-            return value?.ToString();
+            var method = context.Source.Type.GetMethod(nameof(ToString), new Type[0]);
+            var toString = Expression.Call(context.Value, method);
+            return context.IfValueNotNullThen(toString);
         }
     }
 }

@@ -38,6 +38,39 @@ namespace QMapper
         }
 
         /// <summary>
+        /// 检测如果值不为null则使用then值
+        /// 则否根据目标类型返回null或抛出不支持的异常
+        /// </summary>
+        /// <param name="thenValue"></param>
+        /// <returns></returns>
+        public Expression IfValueNotNullThen(Expression thenValue)
+        {
+            if (this.Source.IsNotNullValueType == true)
+            {
+                return thenValue;
+            }
+
+            var value = Expression.Variable(this.Target.Type, "value");
+            var thenAssign = Expression.Assign(value, thenValue);
+            var nullAssign = (Expression)Expression.Assign(value, Expression.Default(this.Target.Type));
+
+            if (this.Target.IsNotNullValueType == true)
+            {
+                var exception = new NotSupportedException($"不支持null值的{this.Source.Info}转换为{this.Target.Info}");
+                nullAssign = Expression.Throw(Expression.Constant(exception));
+            }
+
+            var condition = Expression.IfThenElse(
+                Expression.Equal(this.Value, Expression.Default(this.Source.Type)),
+                nullAssign,
+                thenAssign
+            );
+
+            return Expression.Block(new ParameterExpression[] { value }, condition, value);
+        }
+
+
+        /// <summary>
         /// 表示属性信息
         /// </summary>
         public class Property

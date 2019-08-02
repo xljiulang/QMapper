@@ -20,13 +20,14 @@ namespace QMapper
                 return this.Next.Invoke(context);
             }
 
-            // (XXEnum?)(int value)  (XXEnum)(int? value)  (XXEnum)(double value)
+            // 源类型为值类型，直接强制转换为枚举
             if (context.Source.IsValueType == true)
             {
                 return Expression.Convert(context.Value, context.Target.Type);
             }
 
-            return this.CallStaticConvertIfNotNull(context, nameof(ConvertToEnum)); 
+            var thenValue = this.CallConvertMethod(nameof(ConvertToEnum), context);
+            return context.IfValueNotNullThen(thenValue);
         }
 
 

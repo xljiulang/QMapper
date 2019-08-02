@@ -25,9 +25,8 @@ namespace QMapper
             {
                 return Expression.Convert(context.Value, context.Target.Type);
             }
-             
-            var value = this.CallStaticConvert(context, nameof(ConvertToEnum));
-            return this.IfValueIsNotNullThen(context, value);
+
+            return this.CallStaticConvertIfNotNull(context, nameof(ConvertToEnum)); 
         }
 
 

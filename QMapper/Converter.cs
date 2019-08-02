@@ -53,31 +53,26 @@ namespace QMapper
         }
 
         /// <summary>
-        /// 检测如果值不为null则使用then值
-        /// 则否根据目标类型返回null或抛出不支持的异常
+        /// 表达式类型转换
         /// </summary>
         /// <param name="context">上下文</param>
-        /// <param name="thenValue"></param>
         /// <returns></returns>
-        protected Expression IfValueIsNotNullThen(Context context, Expression thenValue)
+        public static Expression Convert(Context context)
         {
-            if (context.Source.IsNotNullValueType == true)
-            {
-                return thenValue;
-            }
+            return converter.Invoke(context);
+        }
 
-            var value = Expression.Variable(context.Target.Type, "value");
-            var condition = Expression.IfThenElse(
-                Expression.Equal(context.Value, Expression.Constant(null, context.Source.Type)),
-                Expression.IfThenElse(Expression.IsFalse(
-                    Expression.Constant(context.Target.IsNotNullValueType)),
-                    Expression.Assign(value, Expression.Constant(null, context.Target.Type)),
-                    Expression.Throw(Expression.Constant(new NotSupportedException($"不支持null值的{context.Source.Info}转换为{context.Target.Info}")))
-                ),
-                Expression.Assign(value, thenValue)
-            );
-
-            return Expression.Block(new ParameterExpression[] { value }, condition, value);
+        /// <summary>
+        /// 检测如果值不为null则调用转换方法
+        /// 则否根据目标类型返回null或抛出不支持的异常
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="convertMethodName">转换方法</param>
+        /// <returns></returns>
+        protected Expression CallStaticConvertIfNotNull(Context context, string convertMethodName)
+        {
+            var value = this.CallStaticConvert(context, convertMethodName);
+            return this.IfValueIsNotNullThen(context, value);
         }
 
         /// <summary>
@@ -87,24 +82,44 @@ namespace QMapper
         /// <param name="context">上下文</param>
         /// <param name="methodName">转换方法名</param>
         /// <returns></returns>
-        protected Expression CallStaticConvert(Context context, string methodName)
+        private Expression CallStaticConvert(Context context, string methodName)
         {
             var method = this.GetType().GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
             var value = Expression.Convert(context.Value, typeof(object));
             var targetType = Expression.Constant(context.Target.NotNullType);
 
             var result = Expression.Call(null, method, value, targetType);
-            return Expression.Convert(result, context.Target.Type);
+            return result.Type == context.Target.Type ? result : (Expression)Expression.Convert(result, context.Target.Type);
         }
 
         /// <summary>
-        /// 表达式类型转换
+        /// 检测如果值不为null则使用then值
+        /// 则否根据目标类型返回null或抛出不支持的异常
         /// </summary>
         /// <param name="context">上下文</param>
+        /// <param name="thenValue"></param>
         /// <returns></returns>
-        public static Expression Convert(Context context)
+        private Expression IfValueIsNotNullThen(Context context, Expression thenValue)
         {
-            return converter.Invoke(context);
+            if (context.Source.IsNotNullValueType == true)
+            {
+                return thenValue;
+            }
+
+            var value = Expression.Variable(context.Target.Type, "value");
+            var exception = new NotSupportedException($"不支持null值的{context.Source.Info}转换为{context.Target.Info}");
+
+            var condition = Expression.IfThenElse(
+                Expression.Equal(context.Value, Expression.Default(context.Source.Type)),
+                Expression.IfThenElse(Expression.IsTrue(
+                    Expression.Constant(context.Target.IsNotNullValueType)),
+                    Expression.Throw(Expression.Constant(exception)),
+                    Expression.Assign(value, Expression.Default(context.Target.Type))
+                ),
+                Expression.Assign(value, thenValue)
+            );
+
+            return Expression.Block(new ParameterExpression[] { value }, condition, value);
         }
     }
 }

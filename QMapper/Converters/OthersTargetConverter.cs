@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace QMapper
@@ -10,24 +9,52 @@ namespace QMapper
     class OthersTargetConverter : Converter
     {
         /// <summary>
-        /// 本类支持的目标类型
-        /// </summary>
-        private static readonly Type[] supportedTypes = new Type[] { typeof(Guid), typeof(DateTimeOffset), typeof(Uri), typeof(Version) };
-
-        /// <summary>
         /// 执行转换
         /// </summary>
         /// <param name="context">上下文</param> 
         /// <returns></returns>
         public override Expression Invoke(Context context)
         {
-            if (supportedTypes.Contains(context.Target.NotNullType) == false)
+            if (context.Target.NotNullType == typeof(Guid))
             {
-                return this.Next.Invoke(context);
+                return this.CallStaticConvertIfNotNull(context, nameof(ConvertToGuid));
             }
 
-            var value = this.CallStaticConvert(context, nameof(ConvertToType));
-            return this.IfValueIsNotNullThen(context, value);
+            if (context.Target.NotNullType == typeof(DateTimeOffset))
+            {
+                return this.CallStaticConvertIfNotNull(context, nameof(ConvertToDateTimeOffset));
+            }
+
+            if (context.Target.NotNullType == typeof(Uri) || context.Target.NotNullType == typeof(Version))
+            {
+                return this.CallStaticConvertIfNotNull(context, nameof(ConvertToType));
+            }
+
+            return this.Next.Invoke(context);
+        }
+
+        /// <summary>
+        /// 将value转换为目标类型
+        /// </summary>
+        /// <param name="value">要转换的值</param>
+        /// <param name="targetNotNullType">转换的目标类型</param>
+        /// <exception cref="NotImplementedException"></exception>
+        /// <returns></returns>
+        private static Guid ConvertToGuid(object value, Type targetNotNullType)
+        {
+            return Guid.Parse(value.ToString());
+        }
+
+        /// <summary>
+        /// 将value转换为目标类型
+        /// </summary>
+        /// <param name="value">要转换的值</param>
+        /// <param name="targetNotNullType">转换的目标类型</param>
+        /// <exception cref="NotImplementedException"></exception>
+        /// <returns></returns>
+        private static DateTimeOffset ConvertToDateTimeOffset(object value, Type targetNotNullType)
+        {
+            return DateTimeOffset.Parse(value.ToString());
         }
 
         /// <summary>
@@ -39,16 +66,6 @@ namespace QMapper
         /// <returns></returns>
         private static object ConvertToType(object value, Type targetNotNullType)
         {
-            if (typeof(Guid) == targetNotNullType)
-            {
-                return Guid.Parse(value.ToString());
-            }
-
-            if (typeof(DateTimeOffset) == targetNotNullType)
-            {
-                return DateTimeOffset.Parse(value.ToString());
-            }
-
             if (typeof(Uri) == targetNotNullType)
             {
                 return new Uri(value.ToString(), UriKind.RelativeOrAbsolute);

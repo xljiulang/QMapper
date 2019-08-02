@@ -25,8 +25,7 @@ namespace QMapper
                 return this.Next.Invoke(context);
             }
 
-            var value = this.CallStaticConvert(context, nameof(ConverToConvertible));
-            return this.IfValueIsNotNullThen(context, value);
+            return this.CallStaticConvertIfNotNull(context, nameof(ConverToConvertible)); ;
         }
 
         /// <summary>

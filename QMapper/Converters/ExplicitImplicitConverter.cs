@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Linq.Expressions;
 
 namespace QMapper
 {
     /// <summary>
-    /// 值类型自动转换
+    /// 显式或隐式转换
     /// </summary>
-    class ValueTypeConverter : Converter
+    class ExplicitImplicitConverter : Converter
     {
         /// <summary>
         /// 执行转换
@@ -14,12 +15,14 @@ namespace QMapper
         /// <returns></returns>
         public override Expression Invoke(Context context)
         {
-            if (context.Source.IsValueType && context.Target.IsValueType)
+            try
             {
                 return Expression.Convert(context.Value, context.Target.Type);
             }
-
-            return this.Next.Invoke(context);
+            catch (Exception)
+            {
+                return this.Next.Invoke(context);
+            }
         }
     }
 }

@@ -15,7 +15,7 @@ namespace QMapper
         /// <returns></returns>
         public override Expression Invoke(Context context)
         {
-            if (context.Target.NotNullType.IsInheritFrom<Enum>() == false)
+            if (context.Target.NonNullableType.IsInheritFrom<Enum>() == false)
             {
                 return this.Next.Invoke(context);
             }
@@ -35,11 +35,11 @@ namespace QMapper
         /// 将value转换为枚举类型
         /// </summary>
         /// <param name="value">要转换的值</param>
-        /// <param name="targetNotNullType">转换的目标类型</param>
+        /// <param name="targetNonNullableType">转换的目标类型</param>
         /// <returns></returns>
-        private static object ConvertToEnum(object value, Type targetNotNullType)
+        private static object ConvertToEnum(object value, Type targetNonNullableType)
         {
-            return Enum.Parse(targetNotNullType, value.ToString(), true);
+            return Enum.Parse(targetNonNullableType, value.ToString(), true);
         }
     }
 }

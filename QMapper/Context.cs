@@ -45,20 +45,14 @@ namespace QMapper
         /// <returns></returns>
         public Expression IfValueNotNullThen(Expression thenValue)
         {
-            if (this.Source.IsNotNullValueType == true)
+            if (this.Source.CanBeNullValue == false)
             {
                 return thenValue;
             }
 
-            var value = Expression.Variable(this.Target.Type, "value");
-            var thenAssign = Expression.Assign(value, thenValue);
-            var nullAssign = (Expression)Expression.Assign(value, Expression.Default(this.Target.Type));
-
-            if (this.Target.IsNotNullValueType == true)
-            {
-                var exception = new NotSupportedException($"不支持null值的{this.Source.Info}转换为{this.Target.Info}");
-                nullAssign = Expression.Throw(Expression.Constant(exception));
-            }
+            var variable = Expression.Variable(this.Target.Type, "value");
+            var nullAssign = this.GetNullValueAssign(variable);
+            var thenAssign = Expression.Assign(variable, thenValue);
 
             var condition = Expression.IfThenElse(
                 Expression.Equal(this.Value, Expression.Default(this.Source.Type)),
@@ -66,7 +60,23 @@ namespace QMapper
                 thenAssign
             );
 
-            return Expression.Block(new ParameterExpression[] { value }, condition, value);
+            return Expression.Block(new ParameterExpression[] { variable }, condition, variable);
+        }
+
+        /// <summary>
+        /// 返回变量null赋值表达式
+        /// </summary>
+        /// <param name="variable">变量</param>
+        /// <returns></returns>
+        private Expression GetNullValueAssign(ParameterExpression variable)
+        {            
+            if (this.Target.CanBeNullValue == true)
+            {
+                return Expression.Assign(variable, Expression.Default(this.Target.Type));
+            }
+
+            var exception = new NotSupportedException($"不支持null值的{this.Source.Info}转换为{this.Target.Info}");
+            return Expression.Throw(Expression.Constant(exception));
         }
 
 
@@ -88,7 +98,7 @@ namespace QMapper
             /// <summary>
             /// 获取类型对应的非空类型
             /// </summary>
-            public Type NotNullType { get; }
+            public Type NonNullableType { get; }
 
             /// <summary>
             /// 获取是否为值类型
@@ -96,9 +106,9 @@ namespace QMapper
             public bool IsValueType { get; }
 
             /// <summary>
-            /// 获取是否为非空的值类型
+            /// 获取值是可以为null
             /// </summary>
-            public bool IsNotNullValueType { get; }
+            public bool CanBeNullValue { get; }
 
             /// <summary>
             /// 属性信息
@@ -107,15 +117,15 @@ namespace QMapper
             public Property(PropertyInfo info)
             {
                 var type = info.PropertyType;
-                var notNullType = Nullable.GetUnderlyingType(type) ?? type;
+                var nonNullableType = Nullable.GetUnderlyingType(type) ?? type;
                 var isValueType = type.GetTypeInfo().IsValueType;
-                var isNotNullValueType = isValueType && type == notNullType;
+                var canBeNullValue = isValueType == false || type != nonNullableType;
 
                 this.Info = info;
                 this.Type = type;
-                this.NotNullType = notNullType;
+                this.NonNullableType = nonNullableType;
                 this.IsValueType = isValueType;
-                this.IsNotNullValueType = isNotNullValueType;
+                this.CanBeNullValue = canBeNullValue;
             }
         }
     }

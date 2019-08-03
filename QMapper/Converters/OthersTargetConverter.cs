@@ -15,19 +15,19 @@ namespace QMapper
         /// <returns></returns>
         public override Expression Invoke(Context context)
         {
-            if (context.Target.NotNullType == typeof(Guid))
+            if (context.Target.NonNullableType == typeof(Guid))
             {
                 var thenValue = this.CallConvertMethod(nameof(ConvertToGuid), context);
                 return context.IfValueNotNullThen(thenValue);
             }
 
-            if (context.Target.NotNullType == typeof(DateTimeOffset))
+            if (context.Target.NonNullableType == typeof(DateTimeOffset))
             {
                 var thenValue = this.CallConvertMethod(nameof(ConvertToDateTimeOffset), context);
                 return context.IfValueNotNullThen(thenValue);
             }
 
-            if (context.Target.NotNullType == typeof(Uri) || context.Target.NotNullType == typeof(Version))
+            if (context.Target.NonNullableType == typeof(Uri) || context.Target.NonNullableType == typeof(Version))
             {
                 var thenValue = this.CallConvertMethod(nameof(ConvertToType), context);
                 return context.IfValueNotNullThen(thenValue);
@@ -62,17 +62,17 @@ namespace QMapper
         /// 将value转换为目标类型
         /// </summary>
         /// <param name="value">要转换的值</param>
-        /// <param name="targetNotNullType">转换的目标类型</param>
+        /// <param name="targetNonNullableType">转换的目标类型</param>
         /// <exception cref="NotImplementedException"></exception>
         /// <returns></returns>
-        private static object ConvertToType(object value, Type targetNotNullType)
+        private static object ConvertToType(object value, Type targetNonNullableType)
         {
-            if (typeof(Uri) == targetNotNullType)
+            if (typeof(Uri) == targetNonNullableType)
             {
                 return new Uri(value.ToString(), UriKind.RelativeOrAbsolute);
             }
 
-            if (typeof(Version) == targetNotNullType)
+            if (typeof(Version) == targetNonNullableType)
             {
                 return new Version(value.ToString());
             }

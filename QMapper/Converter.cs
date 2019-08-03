@@ -64,7 +64,7 @@ namespace QMapper
 
         /// <summary>
         /// 调用静态转换方法
-        /// TResult ConvertMethod(TValue value, Type targetNotNullType)
+        /// TResult ConvertMethod(TValue value, Type targetNonNullableType)
         /// 第一个参数为context.Value，第二个方法为目标类型的非空类型
         /// </summary>
         /// <param name="methodName">转换方法</param>
@@ -90,7 +90,7 @@ namespace QMapper
 
             if (parameters.Length == 2)
             {
-                args[1] = Expression.Constant(context.Target.NotNullType);
+                args[1] = Expression.Constant(context.Target.NonNullableType);
             }
 
             var result = Expression.Call(null, method, args);

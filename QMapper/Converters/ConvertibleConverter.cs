@@ -15,12 +15,12 @@ namespace QMapper
         /// <returns></returns>
         public override Expression Invoke(Context context)
         {
-            if (context.Source.NotNullType.IsInheritFrom<IConvertible>() == false)
+            if (context.Source.NonNullableType.IsInheritFrom<IConvertible>() == false)
             {
                 return this.Next.Invoke(context);
             }
 
-            if (context.Target.NotNullType.IsInheritFrom<IConvertible>() == false)
+            if (context.Target.NonNullableType.IsInheritFrom<IConvertible>() == false)
             {
                 return this.Next.Invoke(context);
             }
@@ -33,11 +33,11 @@ namespace QMapper
         /// 将IConvertible转换为IConvertible类型
         /// </summary>
         /// <param name="value"></param>
-        /// <param name="targetNotNullType"></param>
+        /// <param name="targetNonNullableType"></param>
         /// <returns></returns>
-        private static object ConverToConvertible(IConvertible value, Type targetNotNullType)
+        private static object ConverToConvertible(IConvertible value, Type targetNonNullableType)
         { 
-            return value.ToType(targetNotNullType, null);
+            return value.ToType(targetNonNullableType, null);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace QMapper.Test
             var b = a.AsMap().To<B>();
 
             Assert.Equal(a.Age, b.Age);
-            Assert.Equal(a.Email, b.Email);
+            Assert.Equal(a.Email, (string)b.Email);
             Assert.Equal(a.Name, b.Name);
 
             Assert.Equal(a.Version, b.Version.ToString());
@@ -30,7 +30,7 @@ namespace QMapper.Test
             var b = a.AsMap().Ignore(i => i.Name).To<B>();
 
             Assert.Equal(a.Age, b.Age);
-            Assert.Equal(a.Email, b.Email);
+            Assert.Equal(a.Email, (string)b.Email);
             Assert.NotEqual(a.Name, b.Name);
         }         
     }

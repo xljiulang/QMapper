@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace QMapper.Model
 {
@@ -10,7 +8,7 @@ namespace QMapper.Model
 
         public int Age { get; set; }
 
-        public string Email { get; set; }
+        public Email Email { get; set; }
 
         public Version Version { get; set; }
 

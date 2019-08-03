@@ -15,13 +15,24 @@
 * 不使用Emit，支持非public类型映射
 
 ### 使用例子
+> 动态映射
+
 ```
 var a = new A();
 
 var b = a.AsMap().To<B>();
 var b = a.AsMap("Name","Age").To<B>();
 var b = a.AsMap().Ignore(item=>item.Id).To<B>();
+```
 
+> 编译映射
+
+```
+var mapper = Map.From<A>().Ignore(item=>item.Id).Compile<B>();
+foreach(var a in aArray)
+{
+   var b = mapper.Map(a,new B());
+}
 ```
 
 ### 应用场景

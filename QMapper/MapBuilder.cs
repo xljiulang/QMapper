@@ -41,12 +41,21 @@ namespace QMapper
         }
 
         /// <summary>
+        /// 构建编译形映射创建者
+        /// </summary>
+        /// <param name="includeMembers">映射的的属性名称</param>
+        public MapBuilder(IEnumerable<string> includeMembers)
+            : this(null, includeMembers)
+        {
+        }
+
+        /// <summary>
         /// 构建动态映射创建者
         /// </summary>
         /// <param name="source">数据源</param>
         public MapBuilder(TSource source)
+            : this(source, null)
         {
-            this.source = source;
         }
 
         /// <summary>
@@ -57,7 +66,10 @@ namespace QMapper
         public MapBuilder(TSource source, IEnumerable<string> includeMembers)
         {
             this.source = source;
-            this.includeMembers = new HashSet<string>(includeMembers, StringComparer.OrdinalIgnoreCase);
+            if (includeMembers != null)
+            {
+                this.includeMembers = new HashSet<string>(includeMembers, StringComparer.OrdinalIgnoreCase);
+            }
         }
 
         /// <summary>

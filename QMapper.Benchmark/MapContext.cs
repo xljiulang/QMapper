@@ -13,7 +13,7 @@ namespace QMapper.Benchmark
 
         private static readonly QMapper.IMapper<UserDto, UserInfo> qMapper = Map.From<UserDto>().Compile<UserInfo>();
 
-        private static readonly ObjectsMapper<UserDto, UserInfo> emitmapper = ObjectMapperManager.DefaultInstance.GetMapper<UserDto, UserInfo>();;
+        private static readonly ObjectsMapper<UserDto, UserInfo> emitmapper = ObjectMapperManager.DefaultInstance.GetMapper<UserDto, UserInfo>();
 
 
         [Benchmark]

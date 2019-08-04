@@ -264,6 +264,17 @@ namespace QMapper
             }
 
             /// <summary>
+            /// 将source映射到新的Ttarget类型
+            /// </summary>
+            /// <param name="source">源对象</param>   
+            /// <returns></returns>
+            public TTarget Map(TSource source)
+            {
+                var target = Activator.CreateInstance<TTarget>();
+                return this.Map(source, target);
+            }
+
+            /// <summary>
             /// 映射到目标对象
             /// </summary>
             /// <param name="source">源对象</param>

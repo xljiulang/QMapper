@@ -10,6 +10,13 @@
         where TTarget : class
     {
         /// <summary>
+        /// 将source映射到新的Ttarget类型
+        /// </summary>
+        /// <param name="source">源对象</param>   
+        /// <returns></returns>
+        TTarget Map(TSource source);
+
+        /// <summary>
         /// 将source映射到target
         /// 返回映射后的target
         /// </summary>

@@ -275,6 +275,16 @@ namespace QMapper
             }
 
             /// <summary>
+            /// 将source映射到新的Ttarget类型
+            /// </summary>
+            /// <param name="source">源对象</param>   
+            /// <returns></returns>
+            public TTarget[] Map(IEnumerable<TSource> source)
+            {
+                return source.Select(item => this.Map(item)).ToArray();
+            }
+
+            /// <summary>
             /// 映射到目标对象
             /// </summary>
             /// <param name="source">源对象</param>

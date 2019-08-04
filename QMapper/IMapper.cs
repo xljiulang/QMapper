@@ -1,4 +1,6 @@
-﻿namespace QMapper
+﻿using System.Collections.Generic;
+
+namespace QMapper
 {
     /// <summary>
     /// 定义固化了配置的映射器
@@ -15,6 +17,13 @@
         /// <param name="source">源对象</param>   
         /// <returns></returns>
         TTarget Map(TSource source);
+
+        /// <summary>
+        /// 将source映射到新的Ttarget类型
+        /// </summary>
+        /// <param name="source">源对象</param>   
+        /// <returns></returns>
+        TTarget[] Map(IEnumerable<TSource> source);
 
         /// <summary>
         /// 将source映射到target
